@@ -1,9 +1,4 @@
-import type { LinksFunction } from "@remix-run/node";
-import stylesheet from "~/styles/spinner.css?url";
-
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: stylesheet },
-];
+import "~/styles/spinner.css";
 
 const Spinner = () => {
   return (
