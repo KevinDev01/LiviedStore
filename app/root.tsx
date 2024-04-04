@@ -4,11 +4,15 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "@remix-run/react";
+import Contact from "./components/form/contact";
+import Footer from "~/components/layouts/footer";
 
 import "~/styles/tailwind.css";
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
   return (
     <html lang="en">
       <head>
@@ -18,7 +22,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <main
+          className={
+            location.pathname === "/login" || location.pathname === "/register"
+              ? ""
+              : "px-24"
+          }>
+          {children}
+          <Contact />
+        </main>
+        <Footer />
         <ScrollRestoration />
         <Scripts />
       </body>

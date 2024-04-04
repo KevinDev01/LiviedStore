@@ -19,6 +19,7 @@ import { ValidationErrors } from "~/lib/types";
 // components
 import Input from "~/components/form/input";
 import Spinner from "~/components/form/spinner";
+import Button from "~/components/form/button";
 
 interface AlertProps {
   message: string;
@@ -124,11 +125,7 @@ function Login() {
             {navigation.state === "submitting" ? (
               <Spinner />
             ) : (
-              <button
-                type="submit"
-                className="h-12 w-fit px-5 bg-green-200 text-green-600 text-md font-semibold rounded-md hover:bg-green-300 hover:text-green-700 transition ease-out">
-                Login
-              </button>
+              <Button type={"submit"} label={"Login"} />
             )}
           </div>
           <div className="w-96 mx-auto flex justify-around">

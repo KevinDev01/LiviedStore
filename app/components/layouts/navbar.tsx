@@ -39,7 +39,7 @@ const Navbar: FC<NavbarProps> = ({ user }) => {
           </Form>
         </li>
         <li className="w-48 flex justify-evenly items-center">
-          <div className="relative group pb-3 pt-2">
+          <div className="relative group pb-3 pt-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -70,7 +70,7 @@ const Navbar: FC<NavbarProps> = ({ user }) => {
             ) : (
               <Link
                 to="/login"
-                className="text-md bg-sky-200 text-sky-600 p-1 w-20 text-center rounded-md block">
+                className="text-md bg-sky-200 text-sky-600 p-1 h-10 w-20 flex justify-center items-center rounded-md active:ring-2 active:ring-sky-200 hover:bg-sky-300 hover:text-sky-900 transition ease-out">
                 Login
               </Link>
             )}

@@ -4,7 +4,7 @@ import Footer from "~/components/layouts/footer";
 const AuthLayout = () => {
   const location = useLocation();
   return (
-    <main>
+    <>
       <div
         className={`${
           location.pathname === "/register" ? "h-fit" : "h-screen"
@@ -26,8 +26,7 @@ const AuthLayout = () => {
         </nav>
         <Outlet />
       </div>
-      <Footer />
-    </main>
+    </>
   );
 };
 

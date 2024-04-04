@@ -1,7 +1,6 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { TbTruckDelivery } from "react-icons/tb";
-import { RiWhatsappFill } from "react-icons/ri";
 import Authenticator from "~/services/auth.server";
 // components
 import Navbar from "~/components/layouts/navbar";
@@ -24,9 +23,6 @@ export const meta: MetaFunction = () => {
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await Authenticator.isAuthentic(request);
-  // const user = {
-  //   name: "kevin",
-  // };
   const response = {
     user,
   };
@@ -35,9 +31,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export default function Index() {
   const loaderData = useLoaderData() as any;
-  console.log(loaderData);
   return (
-    <main className="px-24 relative">
+    <>
       <header>
         <Navbar user={loaderData.user} />
       </header>
@@ -74,14 +69,6 @@ export default function Index() {
           envíos a lo largo y ancho de la República Mexicana."
         info="Tienes dudas? aquí las resolvemos"
       />
-      <Link
-        target="_blank"
-        className="fixed bottom-10 right-6"
-        to={`https://wa.me/6622265074?text=¡Hola!%20Estoy%20interesado/a%20en%20obtener%20más%20información%20sobre%20los%20servicios/productos%20ofrecidos%20en%20Livied.%20¿Podrían%20proporcionarme%20detalles%20adicionales?%20¡Gracias!
-`}>
-        <RiWhatsappFill size={40} className="text-green-600 mx-auto" />
-        <p className="text-xs">Contacto</p>
-      </Link>
-    </main>
+    </>
   );
 }

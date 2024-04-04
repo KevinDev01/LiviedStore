@@ -15,7 +15,7 @@ export async function createUser(values: User) {
   return userCreated;
 }
 
-export async function userFindbyEmail(email: string) {
+export async function userFindByEmail(email: string) {
   const userFound = await db.user.findUnique({
     where: {
       email,

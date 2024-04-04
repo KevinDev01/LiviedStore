@@ -2,7 +2,7 @@ import { SessionStorage, redirect, json } from "@remix-run/node";
 import { sessionStorage } from "./session.server";
 import { Profile, AuthRedirectOptions, User, ErrorsBox } from "~/lib/types";
 import { registerSchema, authenticateSchema } from "~/schemas/auth.schema";
-import { createUser, userFindbyEmail } from "~/database/hooks/user.server";
+import { createUser, userFindByEmail } from "~/database/hooks/user.server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -46,7 +46,7 @@ class AuthStrategy {
 
     try {
       authenticateSchema.parse(values);
-      const user = await userFindbyEmail(values.email);
+      const user = await userFindByEmail(values.email);
 
       if (user === null) {
         session.flash("error", "Usuario no encontrado");
