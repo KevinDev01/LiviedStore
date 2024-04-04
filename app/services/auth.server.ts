@@ -3,7 +3,7 @@ import { sessionStorage } from "./session.server";
 import { Profile, AuthRedirectOptions, User, ErrorsBox } from "~/lib/types";
 import { registerSchema, authenticateSchema } from "~/schemas/auth.schema";
 import { createUser, userFindbyEmail } from "~/database/hooks/user.server";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 type Response = null | Profile;

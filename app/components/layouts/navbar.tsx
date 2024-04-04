@@ -1,6 +1,16 @@
+import { FC } from "react";
 import { Form, Link } from "@remix-run/react";
 
-const Navbar = () => {
+type User = {
+  name: string;
+  lastname?: string;
+};
+
+interface NavbarProps {
+  user: User;
+}
+
+const Navbar: FC<NavbarProps> = ({ user }) => {
   return (
     <nav className="py-5 flex">
       <img className="text-5xl w-48 h-12" src="#" alt="Livied" />
@@ -52,11 +62,19 @@ const Navbar = () => {
               </button>
             </div>
           </div>
-          <Link
-            to="/login"
-            className="text-md bg-sky-200 text-sky-600 p-1 w-20 text-center rounded-md">
-            Login
-          </Link>
+          <div>
+            {user ? (
+              <p>
+                Hola! <span>{user.name}</span>
+              </p>
+            ) : (
+              <Link
+                to="/login"
+                className="text-md bg-sky-200 text-sky-600 p-1 w-20 text-center rounded-md block">
+                Login
+              </Link>
+            )}
+          </div>
         </li>
       </ul>
     </nav>

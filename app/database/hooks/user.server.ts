@@ -1,5 +1,5 @@
 import db from "../db.server";
-import { User } from "~/lib/auth.types";
+import { User } from "~/lib/types";
 
 export async function createUser(values: User) {
   const { email, name, password, lastname } = values;

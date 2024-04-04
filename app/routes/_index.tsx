@@ -24,7 +24,13 @@ export const meta: MetaFunction = () => {
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await Authenticator.isAuthentic(request);
-  return user;
+  // const user = {
+  //   name: "kevin",
+  // };
+  const response = {
+    user,
+  };
+  return response;
 };
 
 export default function Index() {
@@ -33,7 +39,7 @@ export default function Index() {
   return (
     <main className="px-24 relative">
       <header>
-        <Navbar />
+        <Navbar user={loaderData.user} />
       </header>
       <BannerSlider />
       <section className="flex h-fit pt-10">
