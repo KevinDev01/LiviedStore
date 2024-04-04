@@ -6,6 +6,7 @@ import {
   ScrollRestoration,
   useLocation,
 } from "@remix-run/react";
+import { CartProvider } from "./context/cart.context";
 import Contact from "./components/form/contact";
 import Footer from "~/components/layouts/footer";
 
@@ -40,5 +41,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <CartProvider>
+      <Outlet />
+    </CartProvider>
+  );
 }
