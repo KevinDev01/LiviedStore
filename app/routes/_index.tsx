@@ -22,7 +22,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const user = await Authenticator.isAuthentic(request);
+  const user = await Authenticator.getUser(request);
   const response = {
     user,
   };

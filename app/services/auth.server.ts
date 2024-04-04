@@ -15,7 +15,27 @@ class AuthStrategy {
     this.session = session;
   }
 
-  async isAuthentic(request: Request) {
+  async isAdmin(request: Request, options: AuthRedirectOptions) {
+    const session = await this.session.getSession(
+      request.headers.get("Cookie")
+    );
+    if (session.data.token) {
+      const decoded = jwt.verify(
+        session.data.token,
+        process.env.SECRET_KEY as string
+      );
+      return decoded;
+    }
+    session.flash("error", "No cumples con los permisos necesarios.");
+    // Redirect back to the login page with errors.
+    return redirect(options.failureRedirect as string, {
+      headers: {
+        "Set-Cookie": await this.session.commitSession(session),
+      },
+    });
+  }
+
+  async getUser(request: Request) {
     const session = await this.session.getSession(
       request.headers.get("Cookie")
     );

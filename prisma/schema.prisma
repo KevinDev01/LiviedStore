@@ -23,6 +23,7 @@ model User {
   verified Boolean @default(false)
   orders Orders[]
   address Address?
+  role Role @default(USER)
 }
 
 model Orders {
@@ -58,4 +59,9 @@ type Address {
   city   String
   state  String
   zip    String
+}
+
+enum Role {
+  USER
+  ADMIN
 }
