@@ -1,7 +1,8 @@
-import { Link } from "@remix-run/react";
+import { Link, useLocation } from "@remix-run/react";
 import { RiWhatsappFill } from "react-icons/ri";
 
 const Contact = () => {
+  const location = useLocation();
   return (
     <Link
       target="_blank"

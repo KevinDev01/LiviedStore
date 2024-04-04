@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { TbTruckDelivery } from "react-icons/tb";
 import Authenticator from "~/services/auth.server";
 // components
