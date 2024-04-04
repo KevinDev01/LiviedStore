@@ -1,11 +1,6 @@
 import { SessionStorage, redirect, json } from "@remix-run/node";
 import { sessionStorage } from "./session.server";
-import {
-  Profile,
-  AuthRedirectOptions,
-  User,
-  ErrorsBox,
-} from "~/lib/auth.types";
+import { Profile, AuthRedirectOptions, User, ErrorsBox } from "~/lib/types";
 import { registerSchema, authenticateSchema } from "~/schemas/auth.schema";
 import { createUser, userFindbyEmail } from "~/database/hooks/user.server";
 import bcrypt from "bcrypt";
@@ -24,7 +19,13 @@ class AuthStrategy {
     const session = await this.session.getSession(
       request.headers.get("Cookie")
     );
-    console.log(session.data);
+    if (session.data.token) {
+      const decoded = jwt.verify(
+        session.data.token,
+        process.env.SECRET_KEY as string
+      );
+      return decoded;
+    }
     return null;
   }
 
@@ -77,7 +78,7 @@ class AuthStrategy {
       }
       const { name, id, email, lastname } = user;
       const token = jwt.sign(
-        { id, name, email },
+        { id, name, email, lastname },
         process.env.SECRET_KEY as string,
         { expiresIn: "7d" }
       );

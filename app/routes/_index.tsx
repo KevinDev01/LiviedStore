@@ -1,8 +1,8 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Link } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { TbTruckDelivery } from "react-icons/tb";
 import { RiWhatsappFill } from "react-icons/ri";
-// import Authenticator from "~/services/auth.server";
+import Authenticator from "~/services/auth.server";
 // components
 import Navbar from "~/components/layouts/navbar";
 import CategoryBox from "~/components/store/category_box";
@@ -22,12 +22,14 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-// export const loader = async ({ request }: LoaderFunctionArgs) => {
-//   const user = Authenticator.isAuthentic(request);
-//   return null;
-// };
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await Authenticator.isAuthentic(request);
+  return user;
+};
 
 export default function Index() {
+  const loaderData = useLoaderData() as any;
+  console.log(loaderData);
   return (
     <main className="px-24 relative">
       <header>
