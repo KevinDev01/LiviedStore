@@ -84,7 +84,11 @@ function Register() {
   const navigation = useNavigation();
   return (
     <>
-      <div className="w-1/2 bg-amber-500"></div>
+      <div className="w-1/2 bg-hero-register bg-center bg-cover flex justify-center items-center">
+        <h1 className="font-black text-rose-700 text-6xl">
+          ¡Salta a <span className="text-white underline">precios bajos!</span>
+        </h1>
+      </div>
       <div className="w-1/2 px-5 pt-16 pb-8">
         <h1 className="text-2xl text-center font-semibold">Crear cuenta</h1>
         {loaderData?.error && (

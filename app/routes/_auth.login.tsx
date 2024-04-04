@@ -84,7 +84,7 @@ function Login() {
   const navigation = useNavigation();
   return (
     <>
-      <div className="w-1/2 bg-amber-500"></div>
+      <div className="w-1/2 bg-hero-login bg-center bg-cover"></div>
       <div className="w-1/2 px-5 pt-16">
         <h1 className="text-2xl text-center font-semibold">Iniciar session</h1>
         {loaderData?.error && (
