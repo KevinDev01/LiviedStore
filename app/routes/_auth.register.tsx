@@ -103,6 +103,7 @@ function Register() {
             description="Ingresa tu nombre"
             pattern="[A-Za-z]+"
             error={actionData?.name && <Alert message={actionData.name} />}
+            width="w-96"
           />
           <Input
             id="lastname"
@@ -114,6 +115,7 @@ function Register() {
             error={
               actionData?.lastname && <Alert message={actionData.lastname} />
             }
+            width="w-96"
           />
           <Input
             id="email"
@@ -122,6 +124,7 @@ function Register() {
             type="email"
             description="Ingresa tu correo electrónico"
             error={actionData?.email && <Alert message={actionData.email} />}
+            width="w-96"
           />
           <Input
             id="password"
@@ -133,6 +136,7 @@ function Register() {
             error={
               actionData?.password && <Alert message={actionData.password} />
             }
+            width="w-96"
           />
           <Input
             id="repeatPassword"
@@ -146,6 +150,7 @@ function Register() {
                 <Alert message={actionData.repeatPassword} />
               )
             }
+            width="w-96"
           />
           <div className="w-96 mx-auto flex gap-2">
             <input

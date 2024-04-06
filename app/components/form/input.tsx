@@ -9,6 +9,7 @@ interface InputFieldsProps {
   pattern?: string;
   min?: number;
   error?: React.ReactNode;
+  width?: string;
 }
 
 const Input: FC<InputFieldsProps> = ({
@@ -20,9 +21,10 @@ const Input: FC<InputFieldsProps> = ({
   pattern,
   min,
   error,
+  width,
 }) => {
   return (
-    <div className="relative w-96 mx-auto">
+    <div className={`relative ${width} mx-auto`}>
       <input
         minLength={min}
         placeholder=" "

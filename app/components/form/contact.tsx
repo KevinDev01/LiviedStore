@@ -7,7 +7,9 @@ const Contact = () => {
     <Link
       target="_blank"
       className={
-        location.pathname === "/login" || location.pathname === "/register"
+        location.pathname === "/login" ||
+        location.pathname === "/register" ||
+        location.pathname === "/product/create"
           ? "hidden"
           : "fixed bottom-10 right-6"
       }

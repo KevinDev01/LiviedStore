@@ -25,9 +25,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <main
           className={
-            location.pathname === "/login" || location.pathname === "/register"
+            location.pathname === "/login" ||
+            location.pathname === "/register" ||
+            location.pathname === "/product/create"
               ? ""
-              : "px-24"
+              : "px-10"
           }>
           {children}
           <Contact />

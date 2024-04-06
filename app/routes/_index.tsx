@@ -47,7 +47,6 @@ export default function Index() {
             <ProductBox />
             <ProductBox />
             <ProductBox />
-            <ProductBox />
           </div>
         </div>
       </section>

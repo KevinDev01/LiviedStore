@@ -98,6 +98,7 @@ function Login() {
             type="email"
             description="Ingresa tu correo electrónico"
             error={actionData?.email && <Alert message={actionData.email} />}
+            width="w-96"
           />
           <Input
             id="password"
@@ -109,6 +110,7 @@ function Login() {
             error={
               actionData?.password && <Alert message={actionData.password} />
             }
+            width="w-96"
           />
           <div className="w-96 mx-auto flex gap-2">
             <input
