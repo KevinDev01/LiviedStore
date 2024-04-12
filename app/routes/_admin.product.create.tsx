@@ -12,6 +12,7 @@ import {
 } from "~/components/ui/select";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Admin panel | Nuevo producto" }];
@@ -28,16 +29,21 @@ export default function ProductCreate() {
 
   return (
     <>
-      <div className="w-1/2 bg-hero-create">
-        <ProductBox onEdit={true} />
-      </div>
-      <div className="w-1/2 pt-5 px-10 py-10">
-        <Link
-          to={"/panel"}
-          className="hover:underline hover:text-red-600 transition ease-in">
-          Volver
-        </Link>
-        <h2 className="text-xl text-center font-medium">Nuevo producto</h2>
+      <aside className="w-1/2 pb-10 h-fit sticky top-16 flex justify-center">
+        <ProductBox />
+      </aside>
+      <div className="bg-white w-1/2 pt-5 px-10 py-10">
+        <div className="flex justify-between">
+          <h2 className="text-2xl text-center font-medium">Nuevo producto</h2>
+
+          <Link
+            to={"/panel"}
+            className="hover:underline hover:text-red-600 transition ease-in">
+            Volver
+          </Link>
+        </div>
+        <hr className="my-5" />
+        <h3 className="text-center font-medium">Datos generales</h3>
         <Form method="post" className="pt-5 space-y-7">
           <InputCustom
             id="name"
@@ -73,6 +79,25 @@ export default function ProductCreate() {
               width="w-1/2"
             />
           </div>
+          <div className="w-full flex justify-between gap-5">
+            <div className="items-center flex space-x-2 w-1/2">
+              <Checkbox id="terms1" />
+              <label
+                htmlFor="terms1"
+                className="text-md font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Definir promoción al producto
+              </label>
+            </div>
+            <InputCustom
+              id="discount"
+              type="number"
+              label="% Descuento"
+              description="Asigna un descuento del 0 - 100%"
+              name="discount"
+              width="w-1/2"
+              disabled={true}
+            />
+          </div>
           <Select>
             <SelectTrigger className="w-72 h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-300 shadow-md">
               <SelectValue placeholder="Selecciona una categoría" />
@@ -85,7 +110,6 @@ export default function ProductCreate() {
               ))}
             </SelectContent>
           </Select>
-
           <hr />
           <h3 className="text-center font-medium">Detalles del producto</h3>
           <TextArea

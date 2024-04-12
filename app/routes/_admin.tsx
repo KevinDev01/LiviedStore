@@ -9,9 +9,5 @@ import Authenticator from "~/services/auth.server";
 // };
 
 export default function AdminLayout() {
-  return (
-    <div className="overflow-hidden h-fit">
-      <Outlet />
-    </div>
-  );
+  return <Outlet />;
 }

@@ -9,9 +9,7 @@ const ProductBox: FC<ProductFieldProps> = ({ onEdit }) => {
   return (
     <Link
       to={"#"}
-      className={`${
-        onEdit && "fixed top-16 left-44"
-      } group w-80 h-[32rem] p-2 bg-white border rounded-md shadow-md space-y-2 hover:shadow-xl transition ease-in`}>
+      className="block group w-80 min-w-80 max-w-80 h-[32rem] p-2 bg-white border rounded-md shadow-md space-y-2 hover:shadow-xl transition ease-in">
       <div className="overflow-hidden p-1 rounded-md h-60">
         <img
           src="/resources/Vape-iplay.webp"

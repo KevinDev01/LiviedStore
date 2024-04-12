@@ -10,6 +10,7 @@ interface InputFieldsProps {
   min?: number;
   error?: React.ReactNode;
   width?: string;
+  disabled?: boolean;
 }
 
 const Input: FC<InputFieldsProps> = ({
@@ -22,10 +23,12 @@ const Input: FC<InputFieldsProps> = ({
   min,
   error,
   width,
+  disabled,
 }) => {
   return (
     <div className={`relative ${width} mx-auto`}>
       <input
+        disabled={disabled}
         minLength={min}
         placeholder=" "
         pattern={pattern}

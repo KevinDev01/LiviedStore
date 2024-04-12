@@ -35,7 +35,7 @@ const config = {
       backgroundImage: {
         "hero-login": "url('/resources/login-bg.webp')",
         "hero-register": "url('/resources/register-bg.webp')",
-        "hero-create": "url('/resources/create-bg.webp')",
+        "hero-product": "url('/resources/create-bg.webp')",
       },
     },
   },
