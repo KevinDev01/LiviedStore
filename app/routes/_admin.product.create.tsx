@@ -3,6 +3,7 @@ import { Form, Link } from "@remix-run/react";
 import ProductBox from "~/components/store/product_box";
 import InputCustom from "~/components/form/input";
 import TextArea from "~/components/form/textarea";
+import { DatePickerWithPresets } from "~/components/form/DatePickerWithPresets";
 import {
   Select,
   SelectContent,
@@ -35,7 +36,6 @@ export default function ProductCreate() {
       <div className="bg-white w-1/2 pt-5 px-10 py-10">
         <div className="flex justify-between">
           <h2 className="text-2xl text-center font-medium">Nuevo producto</h2>
-
           <Link
             to={"/panel"}
             className="hover:underline hover:text-red-600 transition ease-in">
@@ -84,32 +84,41 @@ export default function ProductCreate() {
               <Checkbox id="terms1" />
               <label
                 htmlFor="terms1"
-                className="text-md font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                className="text-md font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Definir promoción al producto
               </label>
             </div>
             <InputCustom
               id="discount"
               type="number"
-              label="% Descuento"
+              label="Descuento del producto"
               description="Asigna un descuento del 0 - 100%"
               name="discount"
               width="w-1/2"
               disabled={true}
             />
           </div>
-          <Select>
-            <SelectTrigger className="w-72 h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-300 shadow-md">
-              <SelectValue placeholder="Selecciona una categoría" />
-            </SelectTrigger>
-            <SelectContent>
-              {fields.map((field) => (
-                <SelectItem key={field.value} value={field.value}>
-                  {field.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex justify-between flex-row-reverse">
+            <Select>
+              <SelectTrigger className="w-72 h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-200">
+                <SelectValue placeholder="Selecciona una categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                {fields.map((field) => (
+                  <SelectItem key={field.value} value={field.value}>
+                    {field.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div>
+              <DatePickerWithPresets />
+              <p className="text-sm font-semibold opacity-50">
+                Cuando termina la promoción?
+                <span className="text-red-500">*</span>
+              </p>
+            </div>
+          </div>
           <hr />
           <h3 className="text-center font-medium">Detalles del producto</h3>
           <TextArea
