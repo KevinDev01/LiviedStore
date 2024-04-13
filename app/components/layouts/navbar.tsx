@@ -12,8 +12,10 @@ interface NavbarProps {
 
 const Navbar: FC<NavbarProps> = ({ user }) => {
   return (
-    <nav className="py-5 flex">
-      <img className="text-5xl w-48 h-12" src="#" alt="Livied" />
+    <nav className="py-5 flex items-center">
+      <div className="w-48 h-16 overflow-hidden flex justify-center items-center">
+        <img className="" src="/resources/LIV.svg" alt="Livied" />
+      </div>
       <ul className="w-full flex justify-between">
         <li className="flex-1 mx-20">
           <Form className="relative">

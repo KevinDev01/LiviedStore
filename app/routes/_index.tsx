@@ -3,6 +3,7 @@ import { useLoaderData } from "@remix-run/react";
 import { TbTruckDelivery } from "react-icons/tb";
 import Authenticator from "~/services/auth.server";
 // components
+import Container from "~/components/layouts/container";
 import Navbar from "~/components/layouts/navbar";
 import CategoryBox from "~/components/store/category_box";
 import Filter from "~/components/store/filter";
@@ -32,7 +33,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function Index() {
   const loaderData = useLoaderData() as any;
   return (
-    <>
+    <Container>
       <header>
         <Navbar user={loaderData.user} />
       </header>
@@ -68,6 +69,6 @@ export default function Index() {
           envíos a lo largo y ancho de la República Mexicana."
         info="Tienes dudas? aquí las resolvemos"
       />
-    </>
+    </Container>
   );
 }

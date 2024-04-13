@@ -30,8 +30,10 @@ export default function ProductCreate() {
 
   return (
     <>
-      <aside className="w-1/2 pb-10 h-fit sticky top-16 flex justify-center">
-        <ProductBox />
+      <aside className="bg-hero-product w-1/2 pb-10">
+        <div className="h-fit sticky top-16 flex justify-center">
+          <ProductBox />
+        </div>
       </aside>
       <div className="bg-white w-1/2 pt-5 px-10 py-10">
         <div className="flex justify-between">
