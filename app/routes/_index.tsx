@@ -1,7 +1,10 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { getSession } from "~/services/session.server";
 import { TbTruckDelivery } from "react-icons/tb";
-import Authenticator from "~/services/auth.server";
+import jwt from "jsonwebtoken";
+import { User } from "@prisma/client";
+import { getUserByID } from "~/database/hooks/user.server";
 // components
 import Container from "~/components/layouts/container";
 import Navbar from "~/components/layouts/navbar";
@@ -23,11 +26,17 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const user = await Authenticator.getUser(request);
-  const response = {
-    user,
-  };
-  return response;
+  const session = await getSession(request.headers.get("Cookie"));
+  if (session.data?.token) {
+    const user = jwt.verify(
+      session.data.token as string,
+      process.env.SECRET_KEY as string
+    ) as User;
+    const userFound = await getUserByID(user.id);
+    if (userFound?.role == "ADMIN") return redirect("/panel");
+    return user;
+  }
+  return null;
 };
 
 export default function Index() {
@@ -35,7 +44,7 @@ export default function Index() {
   return (
     <Container>
       <header>
-        <Navbar user={loaderData.user} />
+        <Navbar user={loaderData?.user} />
       </header>
       <BannerSlider />
       <section className="flex h-fit pt-10">

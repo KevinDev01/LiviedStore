@@ -5,6 +5,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { Toaster } from "sonner";
 import { CartProvider } from "./context/cart.context";
 import Footer from "~/components/layouts/footer";
 
@@ -20,6 +21,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <Toaster />
         {children}
         <Footer />
         <ScrollRestoration />

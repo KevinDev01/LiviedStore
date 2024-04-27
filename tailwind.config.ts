@@ -36,6 +36,7 @@ const config = {
         "hero-login": "url('/resources/login-bg.webp')",
         "hero-register": "url('/resources/register-bg.webp')",
         "hero-product": "url('/resources/create-bg.webp')",
+        logo: "url('/resources/LIV.svg')",
       },
     },
   },

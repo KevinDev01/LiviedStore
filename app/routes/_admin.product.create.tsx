@@ -1,6 +1,8 @@
-import { MetaFunction } from "@remix-run/node";
-import { Form, Link } from "@remix-run/react";
-import ProductBox from "~/components/store/product_box";
+import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { Form, Link, useLoaderData } from "@remix-run/react";
+import { useState } from "react";
+
+import ProductEdit from "~/components/store/product_edit";
 import InputCustom from "~/components/form/input";
 import TextArea from "~/components/form/textarea";
 import { DatePickerWithPresets } from "~/components/form/DatePickerWithPresets";
@@ -14,25 +16,39 @@ import {
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
+import { getCategories } from "~/database/hooks/category.server";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Admin panel | Nuevo producto" }];
 };
 
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const categories = await getCategories();
+  const fields = categories.map(({ name, id }) => ({ name, value: id }));
+  return fields;
+};
+
 export default function ProductCreate() {
-  const fields = [
-    { name: "Electronica", value: "1" },
-    { name: "Hogar", value: "2" },
-    { name: "Vapes", value: "3" },
-    { name: "Muebles", value: "4" },
-    { name: "Juguetes", value: "5" },
-  ];
+  const fields = useLoaderData<typeof loader>();
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [image, setImage] = useState("");
+  const [discount, setDiscount] = useState(false);
+  const [off, setOff] = useState(0);
+  const [price, setPrice] = useState(0);
 
   return (
     <>
       <aside className="bg-hero-product w-1/2 pb-10">
         <div className="h-fit sticky top-16 flex justify-center">
-          <ProductBox />
+          <ProductEdit
+            name={name}
+            amount={amount}
+            off={off}
+            discount={discount}
+            price={price}
+            image={image}
+          />
         </div>
       </aside>
       <div className="bg-white w-1/2 pt-5 px-10 py-10">

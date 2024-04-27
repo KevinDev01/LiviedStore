@@ -45,10 +45,32 @@ model Product {
   amount String
   comments Comment[]
   img String
+  category Category @relation(fields: [categoryId], references: [id])
+  categoryId String @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  products Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  subCategories SubCategory[]
+}
+
+model SubCategory {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Comment {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
   comment String
   product Product @relation(fields: [productId], references: [id])
   productId  String @db.ObjectId

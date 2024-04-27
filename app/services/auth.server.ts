@@ -1,12 +1,10 @@
 import { SessionStorage, redirect, json } from "@remix-run/node";
 import { sessionStorage } from "./session.server";
-import { Profile, AuthRedirectOptions, User, ErrorsBox } from "~/lib/types";
+import { AuthRedirectOptions, User, ErrorsBox } from "~/lib/types";
 import { registerSchema, authenticateSchema } from "~/schemas/auth.schema";
 import { createUser, userFindByEmail } from "~/database/hooks/user.server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
-type Response = null | Profile;
 
 class AuthStrategy {
   private session: SessionStorage;
@@ -15,41 +13,7 @@ class AuthStrategy {
     this.session = session;
   }
 
-  async isAdmin(request: Request, options: AuthRedirectOptions) {
-    const session = await this.session.getSession(
-      request.headers.get("Cookie")
-    );
-    if (session.data.token) {
-      const decoded = jwt.verify(
-        session.data.token,
-        process.env.SECRET_KEY as string
-      );
-      return decoded;
-    }
-    session.flash("error", "No cumples con los permisos necesarios.");
-    // Redirect back to the login page with errors.
-    return redirect(options.failureRedirect as string, {
-      headers: {
-        "Set-Cookie": await this.session.commitSession(session),
-      },
-    });
-  }
-
-  async getUser(request: Request) {
-    const session = await this.session.getSession(
-      request.headers.get("Cookie")
-    );
-    if (session.data.token) {
-      const decoded = jwt.verify(
-        session.data.token,
-        process.env.SECRET_KEY as string
-      );
-      return decoded;
-    }
-    return null;
-  }
-
-  async authenticate(request: Request, options: AuthRedirectOptions) {
+  async login(request: Request, options: AuthRedirectOptions) {
     if (
       typeof options.failureRedirect !== "string" ||
       typeof options.successRedirect !== "string"
@@ -65,38 +29,38 @@ class AuthStrategy {
     } as User;
 
     try {
+      // validations of the form
       authenticateSchema.parse(values);
-      const user = await userFindByEmail(values.email);
-
-      if (user === null) {
+      // find user
+      const userFound = await userFindByEmail(values.email);
+      // validate credentials of user
+      if (userFound === null) {
         session.flash("error", "Usuario no encontrado");
-        // Redirect back to the login page with errors.
         return redirect(options.failureRedirect, {
           headers: {
             "Set-Cookie": await this.session.commitSession(session),
           },
         });
       }
-      const match = await bcrypt.compare(values.password, user.password);
+      const match = await bcrypt.compare(values.password, userFound.password);
       if (!match) {
         session.flash("error", "Email u contraseña no es valida");
-        // Redirect back to the login page with errors.
         return redirect(options.failureRedirect, {
           headers: {
             "Set-Cookie": await this.session.commitSession(session),
           },
         });
       }
-      if (user.verified === false) {
+      if (userFound.verified === false) {
         session.flash("error", "Usuario no verificado");
-        // Redirect back to the login page with errors.
         return redirect(options.failureRedirect, {
           headers: {
             "Set-Cookie": await this.session.commitSession(session),
           },
         });
       }
-      const { name, id, email, lastname } = user;
+      // add to jsonwebtoken
+      const { name, id, email, lastname } = userFound;
       const token = jwt.sign(
         { id, name, email, lastname },
         process.env.SECRET_KEY as string,

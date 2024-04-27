@@ -1,8 +1,9 @@
 import { FC } from "react";
-import type {
-  MetaFunction,
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
+import {
+  type MetaFunction,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+  redirect,
 } from "@remix-run/node";
 import {
   Form,
@@ -42,6 +43,9 @@ export const meta: MetaFunction = () => {
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
+  if (session.has("token")) {
+    return redirect("/");
+  }
   const data = { error: session.get("error") };
   return json(data, {
     headers: {
@@ -51,7 +55,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  return await Authenticator.authenticate(request, {
+  return await Authenticator.login(request, {
     failureRedirect: "/login",
     successRedirect: "/",
   });
@@ -99,6 +103,7 @@ function Login() {
             description="Ingresa tu correo electrónico"
             error={actionData?.email && <Alert message={actionData.email} />}
             width="w-96"
+            orientation="center"
           />
           <Input
             id="password"
@@ -111,6 +116,7 @@ function Login() {
               actionData?.password && <Alert message={actionData.password} />
             }
             width="w-96"
+            orientation="center"
           />
           <div className="w-96 mx-auto flex gap-2">
             <input

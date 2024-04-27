@@ -1,6 +1,23 @@
+import { FC } from "react";
 import { Link } from "@remix-run/react";
 
-const ProductBox = () => {
+interface ProductEditProps {
+  name: string;
+  amount: string;
+  image: string;
+  price: number;
+  off: number;
+  discount: boolean;
+}
+
+const ProductEdit: FC<ProductEditProps> = ({
+  name,
+  amount,
+  image,
+  price,
+  off,
+  discount,
+}) => {
   return (
     <Link
       to={"#"}
@@ -110,4 +127,4 @@ const ProductBox = () => {
   );
 };
 
-export default ProductBox;
+export default ProductEdit;
