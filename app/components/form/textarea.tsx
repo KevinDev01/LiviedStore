@@ -8,6 +8,8 @@ interface TextAreaFieldsProps {
   error?: React.ReactNode;
   width: string;
   height: string;
+  handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  value?: string;
 }
 
 const TextArea: FC<TextAreaFieldsProps> = ({
@@ -18,10 +20,14 @@ const TextArea: FC<TextAreaFieldsProps> = ({
   error,
   width,
   height,
+  handleChange,
+  value,
 }) => {
   return (
     <div className={`relative ${width} ${height} mx-auto`}>
       <textarea
+        onChange={handleChange}
+        defaultValue={value}
         placeholder=" "
         name={name}
         id={id}

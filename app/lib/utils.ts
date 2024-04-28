@@ -17,5 +17,20 @@ export function formatterPrice(precio: number) {
 export function formatterDate(date: string) {
   const newDate = new Date(date);
   return newDate.toLocaleString("es-MX");
-  1;
+}
+
+export function getPriceWithDiscount(price: number, porcentage: number) {
+  const withDiscount = price - (porcentage / 100) * price;
+  return formatterPrice(withDiscount);
+}
+
+export function getDays(dateObjetive: Date) {
+  const today = new Date();
+  const timeToday = today.getTime();
+  const timeObjetive = dateObjetive.getTime();
+
+  const difference = timeObjetive - timeToday;
+  const remainingDays = Math.ceil(difference / (1000 * 60 * 60 * 24));
+
+  return remainingDays;
 }

@@ -18,14 +18,20 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 
-export function DatePickerWithPresets() {
-  const [date, setDate] = useState<Date>();
-
+export function DatePickerWithPresets({
+  disabled,
+  date,
+  setDate,
+}: {
+  disabled: boolean;
+  date: Date | undefined;
+  setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+}) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          disabled
+          disabled={disabled}
           variant={"outline"}
           className={cn(
             "w-72 h-14 justify-start text-left font-normal text-md",
@@ -46,10 +52,10 @@ export function DatePickerWithPresets() {
             <SelectValue placeholder="Select" />
           </SelectTrigger>
           <SelectContent position="popper">
-            <SelectItem value="0">Today</SelectItem>
-            <SelectItem value="1">Tomorrow</SelectItem>
-            <SelectItem value="3">In 3 days</SelectItem>
-            <SelectItem value="7">In a week</SelectItem>
+            <SelectItem value="0">Hoy</SelectItem>
+            <SelectItem value="1">Mañana</SelectItem>
+            <SelectItem value="3">En 3 Dias</SelectItem>
+            <SelectItem value="7">En una Semana</SelectItem>
           </SelectContent>
         </Select>
         <div className="rounded-md border">
