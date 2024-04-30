@@ -58,6 +58,7 @@ model Category {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   subCategories SubCategory[]
+  features String[]
 }
 
 model SubCategory {

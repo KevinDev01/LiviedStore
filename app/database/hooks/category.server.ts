@@ -22,7 +22,8 @@ export async function createCategory(name: string) {
 export async function updateCategory(
   id: string,
   name: string,
-  fields: SubCategory[]
+  fields: SubCategory[],
+  features: string[]
 ) {
   let categoryUpdated;
   try {
@@ -33,6 +34,7 @@ export async function updateCategory(
       },
       data: {
         name,
+        features: features,
       },
     });
     return json({ message: "Categoria actualizada" }, { status: 200 });
@@ -53,9 +55,8 @@ export async function getCategories() {
 }
 
 export async function getCategory(id: string) {
-  let category;
   try {
-    category = await db.category.findUnique({
+    const category = await db.category.findUnique({
       where: {
         id,
       },
@@ -63,10 +64,10 @@ export async function getCategory(id: string) {
         subCategories: true,
       },
     });
+    return category;
   } catch (error) {
-    category = null;
+    return null;
   }
-  return category;
 }
 
 export async function deleteCategory(id: string) {

@@ -1,8 +1,8 @@
-import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { MetaFunction } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 import { useState, useEffect } from "react";
 import { getCategories } from "~/database/hooks/category.server";
-
+import ProductFeatures from "~/components/form/product_features";
 import ProductEdit from "~/components/store/product_edit";
 import InputCustom from "~/components/form/input";
 import TextArea from "~/components/form/textarea";
@@ -19,46 +19,69 @@ import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { toast } from "sonner";
 
+type ProductFields = {
+  name: string;
+  amount: number;
+  discount: boolean;
+  price: number;
+  porcentage: number;
+  sku: string;
+  categoryId: string;
+  subCategoryId: string;
+  exclusive: boolean;
+  description: string;
+  features: Array<Record<string, string>>;
+  featuresByCategory: Record<string, string | number>;
+  image: string;
+};
+
 export const meta: MetaFunction = () => {
   return [{ title: "Admin panel | Nuevo producto" }];
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async () => {
   const categories = await getCategories();
   return categories;
 };
 
 export default function ProductCreate() {
-  const loaderData = useLoaderData<typeof loader>();
-  const fields = loaderData.map((category) => ({
+  const categoriesData = useLoaderData<typeof loader>();
+  const fields = categoriesData.map((category) => ({
     name: category.name,
     value: category.id,
   }));
-  const regexOnlyNumbers = /^\d+$/;
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [image, setImage] = useState("");
-  const [discount, setDiscount] = useState(false);
-  const [price, setPrice] = useState("");
-  const [porcentage, setPorcentage] = useState("");
-  const [sku, setSku] = useState("");
-  const [date, setDate] = useState<Date>();
-  const [category, setCategory] = useState("");
+  const initialProductState = {
+    name: "",
+    amount: 0,
+    discount: false,
+    price: 0,
+    porcentage: 0,
+    sku: "",
+    categoryId: "",
+    subCategoryId: "",
+    exclusive: false,
+    description: "",
+    features: [],
+    featuresByCategory: {},
+    image: "",
+  };
+  const [product, setProduct] = useState<ProductFields>(initialProductState);
   const [subCategories, setSubCategories] = useState<
     Array<Record<string, string>>
   >([]);
-  const [subCategoryId, setSubCategoryId] = useState("");
-  const [exclusive, setExclusive] = useState(false);
-  const [description, setDescription] = useState("");
   const [feature, setFeature] = useState<Record<string, string>>({});
   const [features, setFeatures] = useState<Record<string, string>[]>([]);
+  const [categoryFound, setCategoryFound] = useState<any>([]);
+  const [fieldsFeatures, setFieldsFeatures] = useState<any>({});
+  const [date, setDate] = useState<Date>();
 
   useEffect(() => {
-    if (loaderData && category) {
-      const subCategoryFilter = loaderData.filter(
-        (categoryItem) => categoryItem.id === category
+    if (categoriesData && product.categoryId) {
+      const categoryFoundByFilter = categoriesData.filter(
+        (categoryItem) => categoryItem.id === product.categoryId
       );
-      const subCategoryFields = subCategoryFilter.map((categoryItem) => {
+      setCategoryFound(categoryFoundByFilter[0]);
+      const subCategoryFields = categoryFoundByFilter.map((categoryItem) => {
         return categoryItem.subCategories.map((subCategory) => ({
           name: subCategory.name,
           value: subCategory.id,
@@ -66,50 +89,28 @@ export default function ProductCreate() {
       });
       setSubCategories(subCategoryFields[0]);
     }
-  }, [category, loaderData]);
-
-  const handleSetName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-  };
-
-  const handleSetPrice = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (
-      regexOnlyNumbers.test(event.target.value) ||
-      event.target.value === ""
-    ) {
-      setPrice(event.target.value);
-    }
-  };
-
-  const handleSetPorcentage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-
-    if (regexOnlyNumbers.test(inputValue) || inputValue === "") {
-      const numericValue = parseInt(inputValue, 10);
-      if (numericValue <= 100) {
-        setPorcentage(numericValue.toString());
-      }
-    }
-  };
-
-  const handleSetAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (
-      regexOnlyNumbers.test(event.target.value) ||
-      event.target.value === ""
-    ) {
-      setAmount(event.target.value);
-    }
-  };
+  }, [product.categoryId, categoriesData]);
 
   const handleSetFeature = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFeature({ name: event.target.value });
   };
 
+  const handleSetFeatureInput = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const value = event.target.value;
+    setFieldsFeatures({
+      ...fieldsFeatures,
+      [name]: value,
+    });
+  };
+
   const handleSetImage = (event: any) => {
     const imageSelected = event.target.files[0];
     if (imageSelected) {
-      const urlImage = URL.createObjectURL(imageSelected);
-      setImage(urlImage);
+      const image = URL.createObjectURL(imageSelected);
+      setProduct({ ...product, image });
     }
   };
 
@@ -132,17 +133,7 @@ export default function ProductCreate() {
     <>
       <aside className="bg-hero-product w-1/2 pb-10">
         <div className="h-fit sticky top-16 flex justify-center">
-          <ProductEdit
-            name={name}
-            amount={amount}
-            discount={discount}
-            price={price}
-            image={image}
-            porcentage={porcentage}
-            date={date}
-            exclusive={exclusive}
-            description={description}
-          />
+          <ProductEdit product={product} date={date} />
         </div>
       </aside>
       <div className="bg-white w-1/2 pt-5 px-10 py-10">
@@ -164,8 +155,10 @@ export default function ProductCreate() {
             description="Ingresa el nombre del producto"
             name="name"
             width="w-full"
-            handleChange={handleSetName}
-            value={name}
+            handleChange={(e) =>
+              setProduct({ ...product, name: e.target.value })
+            }
+            value={product.name}
           />
           <InputCustom
             id="sku"
@@ -174,10 +167,10 @@ export default function ProductCreate() {
             description="Ingresa el identificador del producto"
             name="sku"
             width="w-full"
-            handleChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setSku(event?.target.value)
+            handleChange={(e) =>
+              setProduct({ ...product, sku: e.target.value })
             }
-            value={sku}
+            value={product.sku}
           />
           <div className="w-full flex justify-between gap-5">
             <InputCustom
@@ -187,8 +180,15 @@ export default function ProductCreate() {
               description="Cual es el precio del producto?"
               name="price"
               width="w-1/2"
-              handleChange={handleSetPrice}
-              value={price}
+              handleChange={(e: any) => {
+                if (
+                  !isNaN(e.target.value) ||
+                  e.target.value.toString() === ""
+                ) {
+                  setProduct({ ...product, price: parseFloat(e.target.value) });
+                }
+              }}
+              value={product.price === 0 ? "" : product.price.toString()}
               pattern="^\d+$"
             />
             <InputCustom
@@ -198,21 +198,26 @@ export default function ProductCreate() {
               description="Cuantas cantidades existen?"
               name="amount"
               width="w-1/2"
-              handleChange={handleSetAmount}
-              value={amount}
+              handleChange={(e: any) => {
+                if (!isNaN(e.target.value) || e.target.value.toString() === "")
+                  setProduct({ ...product, amount: parseInt(e.target.value) });
+                return;
+              }}
+              value={product.amount === 0 ? "" : product.amount.toString()}
               pattern="^\d+$"
             />
           </div>
           <div className="w-full flex justify-between gap-5">
             <div className="items-center flex space-x-2 w-1/2">
               <Checkbox
-                id="terms1"
+                id="discount"
+                name="discount"
                 onClick={() => {
-                  setDiscount(!discount);
+                  setProduct({ ...product, discount: !product.discount });
                 }}
               />
               <label
-                htmlFor="terms1"
+                htmlFor="discount"
                 className="text-md font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Definir promoción al producto
               </label>
@@ -224,14 +229,26 @@ export default function ProductCreate() {
               description="Asigna un descuento del 0 - 100%"
               name="discount"
               width="w-1/2"
-              disabled={!discount}
-              handleChange={handleSetPorcentage}
-              value={porcentage}
+              disabled={!product.discount}
+              handleChange={(e: any) => {
+                if (!isNaN(e.target.value) || e.target.value === "") {
+                  const numericValue = parseInt(e.target.value, 10);
+                  if (numericValue <= 100) {
+                    setProduct({ ...product, porcentage: numericValue });
+                  }
+                }
+              }}
+              value={
+                product.porcentage === 0 ? "" : product.porcentage.toString()
+              }
               max="100"
             />
           </div>
           <div className="flex justify-between flex-row-reverse">
-            <Select onValueChange={(categoryId) => setCategory(categoryId)}>
+            <Select
+              onValueChange={(categoryId) =>
+                setProduct({ ...product, categoryId })
+              }>
               <SelectTrigger className="w-72 h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-200">
                 <SelectValue placeholder="Selecciona una categoría" />
               </SelectTrigger>
@@ -245,13 +262,13 @@ export default function ProductCreate() {
             </Select>
             <div className="space-y-3">
               <DatePickerWithPresets
-                disabled={!discount}
+                disabled={!product.discount}
                 date={date}
                 setDate={setDate}
               />
               <p
                 className={`text-sm font-semibold ${
-                  !discount && "opacity-50"
+                  !product.discount && "opacity-50"
                 }`}>
                 Cuando termina la promoción?
                 <span className="text-red-500">*</span>
@@ -262,7 +279,7 @@ export default function ProductCreate() {
             <Select
               disabled={subCategories.length > 0 ? false : true}
               onValueChange={(subCategoryId) =>
-                setSubCategoryId(subCategoryId)
+                setProduct({ ...product, subCategoryId })
               }>
               <SelectTrigger className="w-72 h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-200">
                 <SelectValue placeholder="Selecciona una subCategoria" />
@@ -279,7 +296,7 @@ export default function ProductCreate() {
               <Checkbox
                 id="exclusive"
                 onClick={() => {
-                  setExclusive(!exclusive);
+                  setProduct({ ...product, exclusive: !product.exclusive });
                 }}
               />
               <label
@@ -298,8 +315,10 @@ export default function ProductCreate() {
             description="Descripción del producto"
             width="w-full"
             height="h-56"
-            handleChange={(e) => setDescription(e.target.value)}
-            value={description}
+            handleChange={(e) =>
+              setProduct({ ...product, description: e.target.value })
+            }
+            value={product.description}
           />
           <div className="pt-8 space-y-3">
             <InputCustom
@@ -315,10 +334,9 @@ export default function ProductCreate() {
             <Button
               onClick={() => addFeature()}
               type="button"
-              className="h-12 active:bg-zinc-700 active:ring-2 active:ring-zinc-600">
+              className="h-12 w-28 active:bg-zinc-700 active:ring-2 active:ring-zinc-600">
               Agregar
             </Button>
-
             <nav className="py-2 space-y-3">
               {features.length > 0 ? (
                 features.map((featureItem) => (
@@ -380,6 +398,10 @@ export default function ProductCreate() {
           </div>
           <hr />
           <h3 className="text-center font-medium">Últimos pasos</h3>
+          <ProductFeatures
+            features={categoryFound.features}
+            handleChangeFeatureInput={handleSetFeatureInput}
+          />
           <div className="space-y-5">
             <label htmlFor="picture" className="text-md">
               Subir imagen

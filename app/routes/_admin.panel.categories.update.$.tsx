@@ -14,20 +14,47 @@ import {
   useNavigation,
   useSubmit,
 } from "@remix-run/react";
-import { toast } from "sonner";
+import { getSubCategoryAndDelete } from "~/database/hooks/subcategory.sever";
 import { getCategory, updateCategory } from "~/database/hooks/category.server";
+import { toast } from "sonner";
 import Spinner from "~/components/form/spinner";
 import Input from "~/components/form/input";
 import { Button } from "~/components/ui/button";
-import { getSubCategoryAndDelete } from "~/database/hooks/subcategory.sever";
+import { Checkbox } from "~/components/ui/checkbox";
 
 type SubCategory = Record<string, string | boolean>;
+
+const fieldsFeatures = [
+  { name: "peso", label: "Peso", id: 1 },
+  { name: "capacidad", label: "Capacidad", id: 2 },
+  { name: "dimensiones", label: "Dimensiones", id: 3 },
+  { name: "color", label: "Color", id: 4 },
+  { name: "material", label: "Material", id: 5 },
+  { name: "marca", label: "Marca", id: 6 },
+  { name: "modelo", label: "Modelo", id: 7 },
+  { name: "garantia", label: "Garantía", id: 8 },
+  { name: "compatibilidad", label: "Compatibilidad", id: 9 },
+  { name: "conectividad", label: "Conectividad", id: 10 },
+  { name: "alimentacion", label: "Alimentación", id: 11 },
+  { name: "certificaciones", label: "Certificaciones", id: 12 },
+  { name: "accesorios", label: "Accesorios incluidos", id: 13 },
+  { name: "instrucciones", label: "Instrucciones", id: 14 },
+  { name: "pais_origen", label: "País de origen", id: 15 },
+  {
+    name: "compatibilidad_ambiental",
+    label: "Compatibilidad ambiental",
+    id: 16,
+  },
+  { name: "embalaje", label: "Embalaje", id: 17 },
+  { name: "cuidado", label: "Instrucciones de cuidado", id: 18 },
+  { name: "sabor", label: "Sabor", id: 19 },
+];
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const id = params["*"] as string;
   const category = await getCategory(id);
   if (!category) return redirect("/panel/categories");
-  return { category, url: process.env.URL };
+  return category;
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
@@ -39,6 +66,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       if (subCategoryToDelete) {
         await getSubCategoryAndDelete(subCategoryToDelete.toString());
       }
+
       return json(
         { message: "SubCategoria eliminada correctamente" },
         { status: 200 }
@@ -49,11 +77,20 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       const subcategories: SubCategory[] = JSON.parse(
         body.get("subcategories") as string
       );
+      const selectedFeatures: string[] = JSON.parse(
+        body.get("features") as string
+      );
       const newSubCategories = subcategories.filter(
         (subcategory) => subcategory.new === true
       );
-      if (newSubCategories) {
-        await updateCategory(id as string, categoryName, newSubCategories);
+
+      if (newSubCategories.length > 0 || selectedFeatures.length > 0) {
+        await updateCategory(
+          id as string,
+          categoryName,
+          newSubCategories,
+          selectedFeatures
+        );
       }
       return json({ message: "Categoria Actualizada" }, { status: 200 });
       break;
@@ -67,14 +104,14 @@ export default function Update_categories() {
   const submit = useSubmit();
   const navigation = useNavigation();
   const location = useLocation();
-  const {
-    category: { id, name, subCategories },
-    url,
-  } = useLoaderData<typeof loader>();
+  const { id, name, subCategories, features } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [subCategory, setSubCategory] = useState<SubCategory>({ name: "" });
   const [subCategoriesData, setSubCategoriesData] = useState<SubCategory[]>([]);
   const [alert, setAlert] = useState("");
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>(
+    features ? features : []
+  );
 
   useEffect(() => {
     setSubCategoriesData(subCategories);
@@ -95,10 +132,12 @@ export default function Update_categories() {
     const value = Object.values(subCategory)[0] as string;
     if (value.length <= 0 || !regex.test(value)) {
       setAlert("Nombre no valido");
+      toast.error("Nombre no valido");
       return;
     }
     if (alert) setAlert("");
     subCategory.id = Date.now().toString();
+    ``;
     subCategory.categoryId = id;
     subCategory.new = true;
     setSubCategoriesData([...subCategoriesData, subCategory]);
@@ -125,11 +164,28 @@ export default function Update_categories() {
     toast("SubCategoria eliminada correctamente");
   };
 
+  const handleCheckboxChange = ({
+    estado,
+    name,
+  }: {
+    estado: boolean;
+    name: string;
+  }) => {
+    const featureName = name;
+    if (estado) {
+      setSelectedFeatures([...selectedFeatures, featureName]);
+    } else {
+      setSelectedFeatures(
+        selectedFeatures.filter((feature) => feature !== featureName)
+      );
+    }
+  };
+
   return (
     <div className="px-2 w-full">
       <Form
         method="PUT"
-        className="space-y-7 mt-8 w-1/2"
+        className="space-y-7 mt-8"
         encType="multipart/form-data"
         action={`/panel/categories/update/${id}`}>
         <p className="mb-6 font-medium text-sky-900">
@@ -145,9 +201,10 @@ export default function Update_categories() {
           description="Nombre de la categoría principal"
           min={3}
           pattern="[A-Za-z\s]+"
+          width="w-1/2"
           // error={actionData?.message}
         />
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-4 w-1/2">
           <div className="flex-1">
             <Input
               label="Nueva SubCategoria"
@@ -173,19 +230,19 @@ export default function Update_categories() {
         </div>
         <hr />
         <p className="font-medium text-sky-800">SubCategorías agregadas</p>
-        <div>
+        <div className="w-1/2">
           <nav>
             <ul className="space-y-3">
               {subCategoriesData.length > 0 ? (
                 subCategoriesData.map((item) => (
                   <li
                     key={item.id as string}
-                    className="h-12 bg-neutral-200 px-2 py-1 rounded-sm flex justify-between items-center">
+                    className="h-14 bg-stone-200 px-2 py-1 rounded-md flex justify-between items-center">
                     <p className="font-sans text-lg">{item.name}</p>
                     <div className="flex items-center">
                       <button
                         onClick={() => removeSubCategory(item)}
-                        className="text-lg h-9 w-28 flex gap-2 items-center justify-center bg-red-600 text-white rounded-md">
+                        className="text-lg h-10 w-28 flex gap-2 items-center justify-center bg-red-600 text-white rounded-md">
                         Eliminar
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -206,17 +263,43 @@ export default function Update_categories() {
                 ))
               ) : (
                 <p className="bg-zinc-200 text-zinc-600 p-1 rounded-md text-xl h-14 flex items-center">
-                  Esta categoria aun no tiene sub-categorías.
+                  La categoria aun no tiene sub-categorías.
                 </p>
               )}
             </ul>
           </nav>
         </div>
         <hr />
+        <p className="font-medium text-sky-800">Características agregadas</p>
+        <div className="space-y-3 grid grid-cols-3 gap-2">
+          {fieldsFeatures.map((field) => (
+            <div
+              key={field.id}
+              className="items-center flex space-x-2 w-1/2 pl-2">
+              <Checkbox
+                id={field.name}
+                onCheckedChange={(estado: boolean) =>
+                  handleCheckboxChange({ estado, name: field.name })
+                }
+                checked={selectedFeatures.includes(field.name)}
+              />
+              <label
+                htmlFor={field.name}
+                className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                {field.label}
+              </label>
+            </div>
+          ))}
+        </div>
         <input
           hidden
           defaultValue={JSON.stringify(subCategoriesData)}
           name="subcategories"
+        />
+        <input
+          hidden
+          defaultValue={JSON.stringify(selectedFeatures)}
+          name="features"
         />
         <div className="flex justify-between">
           {navigation.state === "submitting" ? (

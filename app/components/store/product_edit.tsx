@@ -2,29 +2,40 @@ import { FC } from "react";
 import { Link } from "@remix-run/react";
 import { formatterPrice, getDays, getPriceWithDiscount } from "~/lib/utils";
 
-interface ProductEditProps {
+type ProductFields = {
   name: string;
-  amount: string;
-  image: string;
-  price: string;
+  amount: number;
   discount: boolean;
-  porcentage: string;
-  date: Date | undefined;
+  price: number;
+  porcentage: number;
+  sku: string;
+  categoryId: string;
+  subCategoryId: string;
   exclusive: boolean;
   description: string;
-}
+  features: Array<Record<string, string>>;
+  featuresByCategory: Record<string, string | number>;
+  image: string;
+};
 
-const ProductEdit: FC<ProductEditProps> = ({
-  name,
-  amount,
-  image,
-  price,
-  discount,
-  porcentage,
+const ProductEdit = ({
+  product,
   date,
-  exclusive,
-  description,
+}: {
+  product: ProductFields;
+  date: Date | undefined;
 }) => {
+  const {
+    name,
+    amount,
+    discount,
+    price,
+    porcentage,
+    exclusive,
+    description,
+    image,
+  } = product;
+
   return (
     <Link
       to={"#"}
@@ -139,10 +150,10 @@ const ProductEdit: FC<ProductEditProps> = ({
       <div>
         <div className="flex items-center gap-2">
           <p className="block text-2xl font-medium">
-            {discount && price.length > 0 && porcentage.length > 0
-              ? getPriceWithDiscount(parseFloat(price), parseInt(porcentage))
+            {discount && price !== 0 && porcentage !== 0
+              ? getPriceWithDiscount(price, porcentage)
               : price
-              ? formatterPrice(parseFloat(price))
+              ? formatterPrice(price)
               : formatterPrice(0)}
           </p>
           {discount && (
@@ -158,7 +169,7 @@ const ProductEdit: FC<ProductEditProps> = ({
         </div>
         {discount && (
           <p className="line-through text-sm text-neutral-500">
-            {formatterPrice(parseFloat(price))}
+            {formatterPrice(price)}
           </p>
         )}
       </div>
