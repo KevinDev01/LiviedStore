@@ -3,11 +3,9 @@ import Input from "./input";
 const ProductFeatures = ({
   features,
   handleChangeFeatureInput,
-  values,
 }: {
   features: any;
   handleChangeFeatureInput: any;
-  values: Record<string, string>;
 }) => {
   return (
     <>
@@ -24,7 +22,6 @@ const ProductFeatures = ({
               type="text"
               width="1/2"
               handleChange={(e) => handleChangeFeatureInput(e, feature)}
-              value={values[`${feature}`]}
             />
           ))
         ) : (

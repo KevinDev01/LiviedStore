@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
 import { useState, useEffect } from "react";
 import { getCategories } from "~/database/hooks/category.server";
 import ProductFeatures from "~/components/form/product_features";
@@ -61,7 +61,36 @@ export const meta: MetaFunction = () => {
   return [{ title: "Admin panel | Nuevo producto" }];
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {};
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const body = await request.formData();
+  const product = {
+    name: body.get("name") as string,
+    sku: body.get("sku") as string,
+    amount: body.get("amount") as string,
+    price: body.get("price") as string,
+    description: body.get("description") as string,
+    promoId: body.get("promoId") as string,
+    categoryId: body.get("categoryId") as string,
+    subCategoryId: body.get("subCategoryId") as string,
+    exclusive: body.get("exclusive") as string,
+    image: body.get("image") as string,
+  };
+  const globalFeatures = {
+    custom_features: JSON.parse(body.get("custom_features") as string),
+    featuresByCategory: JSON.parse(body.get("featuresByCategory") as string),
+    finalDate: body.get("finalDate") as string,
+  };
+  const customPromo = {
+    porcentage: body.get("porcentage") as string,
+  };
+  console.log(product);
+  console.log("####");
+  console.log(globalFeatures);
+  console.log("####");
+  console.log(customPromo);
+
+  return null;
+};
 
 export const loader = async () => {
   const data = await getCategories();
@@ -93,7 +122,8 @@ const AlertInfo = ({
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="w-6 h-6">
+        className="w-6 h-6"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -111,7 +141,8 @@ const AlertInfo = ({
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="w-6 h-6">
+        className="w-6 h-6"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -123,6 +154,7 @@ const AlertInfo = ({
 };
 
 export default function ProductCreate() {
+  const submit = useSubmit();
   const loaderData = useLoaderData<typeof loader>();
   const [product, setProduct] = useState<ProductFields>(initialValues);
   const [categorySelected, setCategorySelected] = useState<Category>({});
@@ -133,10 +165,6 @@ export default function ProductCreate() {
     Record<string, string | number | null | Date>
   >({});
   const [feature, setFeature] = useState<Record<string, string>>({});
-  const [features, setFeatures] = useState<Record<string, string>[]>([]);
-  const [fieldsFeatures, setFieldsFeatures] = useState<Record<string, string>>(
-    {}
-  );
   const [date, setDate] = useState<Date>();
   const [discount, setDiscount] = useState(false);
 
@@ -147,8 +175,7 @@ export default function ProductCreate() {
       );
       setCategorySelected(categorySelect[0]);
       setSubCategorySelected({});
-      setProduct({ ...product, promoId: "" });
-      setFieldsFeatures({});
+      setProduct({ ...product, promoId: "", featuresByCategory: {} });
     }
   }, [product.categoryId]);
 
@@ -187,9 +214,9 @@ export default function ProductCreate() {
     name: string
   ) => {
     const value = event.target.value;
-    setFieldsFeatures({
-      ...fieldsFeatures,
-      [name]: value,
+    setProduct({
+      ...product,
+      featuresByCategory: { ...product.featuresByCategory, [name]: value },
     });
   };
 
@@ -203,7 +230,7 @@ export default function ProductCreate() {
 
   const addFeature = () => {
     feature.id = Date.now().toString();
-    setFeatures([...features, feature]);
+    setProduct({ ...product, features: [...product.features, feature] });
     setFeature({});
     const input = document.getElementById("feature") as any;
     if (input) input.value = "";
@@ -211,8 +238,8 @@ export default function ProductCreate() {
   };
 
   const deleteFeature = (id: string) => {
-    const newFeatures = features.filter((x) => x.id !== id);
-    setFeatures(newFeatures);
+    const newFeatures = product.features.filter((item) => item.id !== id);
+    setProduct({ ...product, features: newFeatures });
     toast.success(`Característica eliminada`);
   };
 
@@ -220,7 +247,7 @@ export default function ProductCreate() {
     setProduct({ ...product, promoId });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: any) => {
     const formData = new FormData();
     formData.append("name", product.name);
     formData.append("sku", product.sku);
@@ -232,6 +259,20 @@ export default function ProductCreate() {
     formData.append("exclusive", product.exclusive.toString());
     formData.append("description", product.description);
     formData.append("image", product.image);
+    formData.append("custom_features", JSON.stringify(product.features));
+    formData.append(
+      "featuresByCategory",
+      JSON.stringify(product.featuresByCategory)
+    );
+    formData.append("finalDate", date ? date.toString() : "");
+    formData.append(
+      "image",
+      e.target.querySelector('input[type="file"]').files[0]
+    );
+    submit(formData, {
+      method: "POST",
+      encType: "multipart/form-data",
+    });
   };
 
   return (
@@ -251,7 +292,8 @@ export default function ProductCreate() {
           <h2 className="text-2xl text-center font-medium">Nuevo producto</h2>
           <Link
             to={"/panel"}
-            className="hover:underline hover:text-red-600 transition ease-in">
+            className="hover:underline hover:text-red-600 transition ease-in"
+          >
             Volver
           </Link>
         </div>
@@ -262,8 +304,9 @@ export default function ProductCreate() {
           className="pt-5 space-y-7"
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit();
-          }}>
+            handleSubmit(e);
+          }}
+        >
           <InputCustom
             id="name"
             type="text"
@@ -329,7 +372,8 @@ export default function ProductCreate() {
               <Select
                 onValueChange={(categoryId) =>
                   setProduct({ ...product, categoryId })
-                }>
+                }
+              >
                 <SelectTrigger className="w-72 h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-200">
                   <SelectValue placeholder="Selecciona una categoría" />
                 </SelectTrigger>
@@ -357,7 +401,8 @@ export default function ProductCreate() {
                 }
                 onValueChange={(subCategoryId) =>
                   setProduct({ ...product, subCategoryId })
-                }>
+                }
+              >
                 <SelectTrigger className="w-72 h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-200">
                   <SelectValue placeholder="Selecciona la sub categoria" />
                 </SelectTrigger>
@@ -375,7 +420,8 @@ export default function ProductCreate() {
                               typeof subcategory.value === "string"
                                 ? subcategory.value
                                 : ""
-                            }>
+                            }
+                          >
                             {typeof subcategory.name === "string"
                               ? subcategory.name
                               : null}
@@ -401,7 +447,8 @@ export default function ProductCreate() {
               <div className="flex gap-5">
                 <Select
                   value={product.promoId}
-                  onValueChange={(promoId) => handlePromo(promoId)}>
+                  onValueChange={(promoId) => handlePromo(promoId)}
+                >
                   <SelectTrigger className="w-full h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-200 transition ease-in">
                     <SelectValue placeholder="Selecciona una promoción - (opcional)" />
                   </SelectTrigger>
@@ -410,9 +457,8 @@ export default function ProductCreate() {
                       ? subCategorySelected.promo.map((promo) => (
                           <SelectItem
                             key={typeof promo.id === "string" ? promo.id : null}
-                            value={
-                              typeof promo.id === "string" ? promo.id : ""
-                            }>
+                            value={typeof promo.id === "string" ? promo.id : ""}
+                          >
                             {`${
                               typeof promo.name === "string" ? promo.name : null
                             } - Descuento del ${
@@ -431,7 +477,8 @@ export default function ProductCreate() {
                     type="button"
                     onClick={() => {
                       setProduct({ ...product, promoId: "" });
-                    }}>
+                    }}
+                  >
                     Eliminar
                   </Button>
                 )}
@@ -451,7 +498,8 @@ export default function ProductCreate() {
               />
               <label
                 htmlFor="checkbox_discount"
-                className="text-md font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                className="text-md font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
                 Definir promoción al producto
               </label>
             </div>
@@ -488,7 +536,8 @@ export default function ProductCreate() {
             <p
               className={`text-sm font-semibold ml-3 text-zinc-800 ${
                 discount ? "" : "opacity-50"
-              }`}>
+              }`}
+            >
               Cuando termina la promoción?
               <span className="text-red-500 text-lg">*</span>
             </p>
@@ -503,7 +552,8 @@ export default function ProductCreate() {
               />
               <label
                 htmlFor="exclusive"
-                className="text-md font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                className="text-md font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
                 Producto exclusivo online?
               </label>
             </div>
@@ -511,7 +561,6 @@ export default function ProductCreate() {
           <hr />
           <h3 className="text-center font-medium">Detalles del producto</h3>
           <ProductFeatures
-            values={fieldsFeatures}
             features={
               Array.isArray(categorySelected.featureFields)
                 ? categorySelected.featureFields
@@ -545,15 +594,17 @@ export default function ProductCreate() {
             <Button
               onClick={() => addFeature()}
               type="button"
-              className="h-12 w-28 active:bg-zinc-700 active:ring-2 active:ring-zinc-600">
+              className="h-12 w-28 active:bg-zinc-700 active:ring-2 active:ring-zinc-600"
+            >
               Agregar
             </Button>
             <nav className="py-2 space-y-3">
-              {features.length > 0 ? (
-                features.map((featureItem) => (
+              {product.features.length > 0 ? (
+                product.features.map((featureItem) => (
                   <li
                     key={featureItem.id}
-                    className="flex gap-2 items-center justify-between px-2 py-1 rounded-md border-b">
+                    className="flex gap-2 items-center justify-between px-2 py-1 rounded-md border-b"
+                  >
                     {featureItem.name}
                     <svg
                       onClick={() => deleteFeature(featureItem.id)}
@@ -562,7 +613,8 @@ export default function ProductCreate() {
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="w-6 h-6 text-red-500 cursor-pointer">
+                      className="w-6 h-6 text-red-500 cursor-pointer"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -595,7 +647,8 @@ export default function ProductCreate() {
             <div className="flex justify-end">
               <Button
                 type="submit"
-                className="h-12 bg-blue-600 hover:bg-blue-500">
+                className="h-12 bg-blue-600 hover:bg-blue-500"
+              >
                 Crear producto
               </Button>
             </div>
