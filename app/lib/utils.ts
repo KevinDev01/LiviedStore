@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { string } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -19,6 +20,17 @@ export function formatterDate(date: string) {
   return newDate.toLocaleString("es-MX");
 }
 
+export function formatterDateFromString(date: string) {
+  const dateObject = new Date(date);
+  return new Date(
+    Date.UTC(
+      dateObject.getFullYear(),
+      dateObject.getMonth(),
+      dateObject.getDate()
+    )
+  );
+}
+
 export function getPriceWithDiscount(price: number, porcentage: number) {
   const withDiscount = price - (porcentage / 100) * price;
   return formatterPrice(withDiscount);
@@ -32,5 +44,13 @@ export function getDays(dateObjetive: Date) {
   const difference = timeObjetive - timeToday;
   const remainingDays = Math.ceil(difference / (1000 * 60 * 60 * 24));
 
+  return remainingDays;
+}
+
+export function getDaysToDB(date: string) {
+  const currentDate = new Date();
+  const dateObjetive = new Date(date);
+  const difference = dateObjetive.getTime() - currentDate.getTime();
+  const remainingDays = Math.ceil(difference / (1000 * 60 * 60 * 24));
   return remainingDays;
 }

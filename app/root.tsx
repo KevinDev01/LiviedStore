@@ -1,4 +1,5 @@
 import {
+  useNavigation,
   Links,
   Meta,
   Outlet,
@@ -12,6 +13,7 @@ import Footer from "~/components/layouts/footer";
 import "~/styles/tailwind.css";
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const navigation = useNavigation();
   return (
     <html lang="en">
       <head>
@@ -21,6 +23,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        {navigation.state === "loading" && (
+          <div className="mb-1">
+            <div className="h-1 bg-gradient-to-r from-sky-600 via-sky-400 to-sky-600 animate-loading-bar overflow-hidden rounded-full"></div>
+          </div>
+        )}
         <Toaster />
         {children}
         <Footer />

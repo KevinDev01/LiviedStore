@@ -68,6 +68,17 @@ model SubCategory {
   categoryId String @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  promoId Promo[]
+}
+
+model Promo {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  value Int
+  cupon String? 
+  subcategory SubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId String @db.ObjectId
+  finalDate DateTime
 }
 
 model Comment {

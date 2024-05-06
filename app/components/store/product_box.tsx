@@ -78,8 +78,7 @@ const ProductBox = () => {
         </div>
         <p className="font-light text-sm">145 reseñas</p>
       </div>
-
-      <div className="flex gap-2 items-center w-96">
+      <div className="flex gap-2 items-center">
         <div className="w-fit bg-orange-500 p-1 rounded-md shadow-md">
           <p className="font-semibold text-white text-xs uppercase">
             Mas vendido
@@ -97,7 +96,7 @@ const ProductBox = () => {
           <p className="block text-2xl font-medium">$2000</p>
           <p className="block text-sm text-green-600">23% OFF</p>
         </div>
-        <p className="line-through text-sm text-neutral-500">$2800</p>
+        <p className="line-through text-sm text-neutral-500">Anterior $2800</p>
       </div>
       <p className="font-light">4 Disponibles</p>
       <p className="line-clamp-2">

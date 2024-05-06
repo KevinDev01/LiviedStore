@@ -27,7 +27,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return redirect("/panel/categories");
 };
 
-export default function Create_categories() {
+export default function create_categories() {
   const navigation = useNavigation();
   const actionData = useActionData<typeof action>();
   return (

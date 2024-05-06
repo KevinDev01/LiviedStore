@@ -1,5 +1,23 @@
 import { Link, Form } from "@remix-run/react";
 
+const router = [
+  {
+    id: 1,
+    pathname: "/panel/categories/create",
+    label: "Crear categoria",
+  },
+  {
+    id: 2,
+    pathname: "/product/create",
+    label: "Nuevo producto",
+  },
+  {
+    id: 3,
+    pathname: "/panel/promos/create",
+    label: "Nueva promoción",
+  },
+];
+
 const AdminAside = () => {
   return (
     <aside className="w-60 py-2 border-r overflow-hidden sticky top-0 h-screen">
@@ -14,16 +32,14 @@ const AdminAside = () => {
         <div>
           <p className="font-medium pl-5 mt-2 text-sky-800">Acciones rápidas</p>
           <nav className="w-full space-y-2 px-2 mt-1">
-            <Link
-              to={"/panel/categories/create"}
-              className="flex items-center h-10 pl-4 text-md text-white bg-sky-500 hover:bg-sky-600 transition ease-in rounded-md">
-              Crear categoría
-            </Link>
-            <Link
-              to={"/product/create"}
-              className="flex items-center h-10 pl-4 text-md text-white bg-sky-500 hover:bg-sky-600 transition ease-in rounded-md">
-              Nuevo producto
-            </Link>
+            {router.map((route) => (
+              <Link
+                key={route.id}
+                to={route.pathname}
+                className="flex items-center h-10 pl-4 text-md text-white bg-sky-500 hover:bg-sky-600 transition ease-in rounded-md">
+                {route.label}
+              </Link>
+            ))}
           </nav>
         </div>
         <div>

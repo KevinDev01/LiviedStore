@@ -21,6 +21,7 @@ export default function Panel() {
             <Link to="/inventary">Inventario</Link>
             <Link to="/orders">Pedidos</Link>
             <Link to="/panel/categories">Categorías</Link>
+            <Link to="/panel/promos">promociones</Link>
           </div>
           <p>Bienvenido {data?.name}</p>
         </div>

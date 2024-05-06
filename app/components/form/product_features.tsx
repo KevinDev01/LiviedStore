@@ -3,15 +3,17 @@ import Input from "./input";
 const ProductFeatures = ({
   features,
   handleChangeFeatureInput,
+  values,
 }: {
   features: any;
   handleChangeFeatureInput: any;
+  values: Record<string, string>;
 }) => {
   return (
     <>
-      <p>Características del producto</p>
+      {features.length > 0 && <p>Características del producto</p>}
       <div className="grid grid-cols-2 items-center gap-x-3 gap-y-8">
-        {features ? (
+        {features.length > 0 ? (
           features.map((feature: any) => (
             <Input
               key={feature}
@@ -22,6 +24,7 @@ const ProductFeatures = ({
               type="text"
               width="1/2"
               handleChange={(e) => handleChangeFeatureInput(e, feature)}
+              value={values[`${feature}`]}
             />
           ))
         ) : (

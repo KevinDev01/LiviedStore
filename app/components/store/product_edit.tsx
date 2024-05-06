@@ -1,11 +1,15 @@
 import { FC } from "react";
 import { Link } from "@remix-run/react";
-import { formatterPrice, getDays, getPriceWithDiscount } from "~/lib/utils";
+import {
+  formatterPrice,
+  getDays,
+  getDaysToDB,
+  getPriceWithDiscount,
+} from "~/lib/utils";
 
 type ProductFields = {
   name: string;
   amount: number;
-  discount: boolean;
   price: number;
   porcentage: number;
   sku: string;
@@ -13,27 +17,41 @@ type ProductFields = {
   subCategoryId: string;
   exclusive: boolean;
   description: string;
+  promoId: string;
   features: Array<Record<string, string>>;
   featuresByCategory: Record<string, string | number>;
   image: string;
 };
 
+type Promo = {
+  cupon: string;
+  finalDate: string;
+  id: string;
+  name: string;
+  subCategoryId: string;
+  value: number;
+};
+
 const ProductEdit = ({
   product,
   date,
+  discount,
+  promo,
 }: {
   product: ProductFields;
   date: Date | undefined;
+  discount: boolean;
+  promo: Promo | Record<string, string | null | Date | number>;
 }) => {
   const {
     name,
     amount,
-    discount,
     price,
     porcentage,
     exclusive,
     description,
     image,
+    promoId,
   } = product;
 
   return (
@@ -130,17 +148,17 @@ const ProductEdit = ({
         <p className="font-light text-sm">145 reseñas</p>
       </div>
 
-      <div className="flex gap-2 items-center w-96 overflow-hidden">
+      <div className="flex gap-2 items-center">
         <div className="w-fit bg-rose-500 p-1 rounded-md shadow-md">
           <p className="font-semibold text-white text-xs uppercase">
             Nuevo Item
           </p>
         </div>
-        {discount && (
+        {discount || promoId ? (
           <div className="w-fit bg-red-500 text-white px-3 py-1 rounded-md shadow-md">
             <p className="font-medium text-xs uppercase">Oferta</p>
           </div>
-        )}
+        ) : null}
         {exclusive && (
           <div className="w-fit bg-sky-500 text-white px-3 py-1 rounded-md shadow-md">
             <p className="font-medium text-xs uppercase">Exclusivo online</p>
@@ -152,18 +170,34 @@ const ProductEdit = ({
           <p className="block text-2xl font-medium">
             {discount && price !== 0 && porcentage !== 0
               ? getPriceWithDiscount(price, porcentage)
+              : promoId &&
+                typeof promo.value === "number" &&
+                promo.value > 0 &&
+                price !== 0
+              ? getPriceWithDiscount(price, promo.value)
               : price
               ? formatterPrice(price)
               : formatterPrice(0)}
           </p>
-          {discount && (
+          {(discount || promoId) && (
             <p className="ml-1 text-sm text-green-600 font-medium">
-              {porcentage ? porcentage : "0"}% OFF
+              {porcentage
+                ? porcentage
+                : promo.value
+                ? promo.value.toString()
+                : "0"}
+              % OFF
             </p>
           )}
           {discount && date ? (
             <p className="ml-1 text-green-600 font-medium text-sm uppercase text-center">
               Quedan {getDays(date)} dias
+            </p>
+          ) : promoId &&
+            promo.finalDate &&
+            typeof promo.finalDate === "string" ? (
+            <p className="ml-1 text-green-600 font-medium text-sm uppercase text-center">
+              Quedan {getDaysToDB(promo.finalDate)} dias
             </p>
           ) : null}
         </div>

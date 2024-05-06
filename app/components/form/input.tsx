@@ -51,13 +51,13 @@ const Input: FC<InputFieldsProps> = ({
           error
             ? "border-red-400 placeholder-shown:border-red-400"
             : "border-sky-400 placeholder-shown:border-stone-200"
-        } relative peer block w-full h-14 px-2 border invalid:border-red-400 invalid:ring-2 invalid:ring-red-100 text-lg rounded-md md:focus:outline-none focus:valid:border-sky-400 focus:valid:ring-2 focus:valid:ring-sky-200 focus:invalid:border-red-400 focus:invalid:ring-2 focus:invalid:ring-red-100 hover:bg-neutral-50 disabled:bg-transparent disabled:border-neutral-100 disabled:text-neutral-200`}
+        } relative peer block w-full h-14 px-2 border invalid:border-red-400 invalid:ring-2 invalid:ring-red-100 text-lg rounded-md md:focus:outline-none focus:valid:border-sky-400 focus:valid:ring-2 focus:valid:ring-sky-200 focus:invalid:border-red-400 focus:invalid:ring-2 focus:invalid:ring-red-100 hover:bg-neutral-50 disabled:bg-neutral-50 disabled:border-neutral-100 disabled:text-neutral-200 disabled:cursor-not-allowed`}
         onChange={handleChange}
         max={max}
       />
       <label
         htmlFor={id}
-        className="absolute -translate-y-[84px] peer-placeholder-shown:-translate-y-10 peer-focus:-translate-y-[84px] translate-x-2 transition duration-300 peer-disabled:text-neutral-400">
+        className="absolute -translate-y-[84px] peer-placeholder-shown:-translate-y-10 peer-focus:-translate-y-[84px] translate-x-2 transition duration-300 peer-disabled:text-neutral-400 peer-disabled:cursor-not-allowed">
         {label}
       </label>
       <p

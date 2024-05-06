@@ -34,7 +34,7 @@ export function DatePickerWithPresets({
           disabled={disabled}
           variant={"outline"}
           className={cn(
-            "w-72 h-14 justify-start text-left font-normal text-md",
+            "w-full h-14 justify-start text-left font-normal text-md",
             !date && "text-muted-foreground"
           )}>
           <CalendarIcon className="mr-2 h-4 w-4" />

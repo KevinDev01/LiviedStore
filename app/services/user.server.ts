@@ -2,6 +2,7 @@ import { redirect } from "@remix-run/node";
 import { getSession, destroySession } from "./session.server";
 import jwt from "jsonwebtoken";
 import { User } from "~/lib/types";
+import { getUserByID } from "~/database/hooks/user.server";
 
 export async function getUserBySession(request: Request) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -22,4 +23,10 @@ export async function destroyUserSession(request: Request) {
       "Set-Cookie": await destroySession(session),
     },
   });
+}
+
+export async function isAdmin(user: User) {
+  const userFound = await getUserByID(user.id);
+  if (userFound?.role !== "ADMIN") return redirect("/");
+  return null;
 }
