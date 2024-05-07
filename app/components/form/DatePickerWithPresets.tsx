@@ -36,18 +36,21 @@ export function DatePickerWithPresets({
           className={cn(
             "w-full h-14 justify-start text-left font-normal text-md",
             !date && "text-muted-foreground"
-          )}>
+          )}
+        >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {date ? format(date, "PPP") : <span>Fin de la promoción</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="flex w-auto flex-col space-y-2 p-2">
+        className="flex w-auto flex-col space-y-2 p-2"
+      >
         <Select
           onValueChange={(value) =>
             setDate(addDays(new Date(), parseInt(value)))
-          }>
+          }
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select" />
           </SelectTrigger>
