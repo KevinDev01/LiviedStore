@@ -1,10 +1,12 @@
-import { SessionStorage, redirect, json } from "@remix-run/node";
-import { sessionStorage } from "./session.server";
+import { createProductSchema } from "~/schemas/product.schema";
+import { filterErrorsZod } from "~/lib/utils";
 
-class AuthStrategy {
-  private session: SessionStorage;
-
-  constructor(session: SessionStorage) {
-    this.session = session;
+export function validateProduct(values: Record<string, string | number>) {
+  try {
+    createProductSchema.parse(values);
+    return null;
+  } catch (error: any) {
+    const result = filterErrorsZod(error.errors);
+    return result;
   }
 }

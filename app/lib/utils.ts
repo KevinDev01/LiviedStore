@@ -6,6 +6,17 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function filterErrorsZod(
+  errors: Array<Record<string, string | string[]>>
+) {
+  const alerts: Record<string, string> = {};
+  errors.forEach((error) => {
+    const key = Array.isArray(error.path) ? error.path[0] : "";
+    alerts[key] = !Array.isArray(error.message) ? error.message : "";
+  });
+  return alerts;
+}
+
 export function formatterPrice(precio: number) {
   const formatter = new Intl.NumberFormat("es-MX", {
     style: "currency",
@@ -21,6 +32,7 @@ export function formatterDate(date: string) {
 }
 
 export function formatterDateFromString(date: string) {
+  if (!date) return;
   const dateObject = new Date(date);
   return new Date(
     Date.UTC(

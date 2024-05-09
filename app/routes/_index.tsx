@@ -3,7 +3,7 @@ import { useLoaderData } from "@remix-run/react";
 import { getSession } from "~/services/session.server";
 import { TbTruckDelivery } from "react-icons/tb";
 import jwt from "jsonwebtoken";
-import { User } from "@prisma/client";
+import { Product, User } from "@prisma/client";
 import { getUserByID } from "~/database/hooks/user.server";
 // components
 import Container from "~/components/layouts/container";
@@ -13,6 +13,7 @@ import Filter from "~/components/store/filter";
 import ProductBox from "~/components/store/product_box";
 import Banner from "~/components/layouts/banner";
 import BannerSlider from "~/components/layouts/banner_slider";
+import { getProducts } from "~/database/hooks/product.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -26,6 +27,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  let userData;
   const session = await getSession(request.headers.get("Cookie"));
   if (session.data?.token) {
     const user = jwt.verify(
@@ -34,17 +36,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     ) as User;
     const userFound = await getUserByID(user.id);
     if (userFound?.role == "ADMIN") return redirect("/panel");
-    return user;
+    userData = user;
   }
-  return null;
+  const products = (await getProducts()) as Product;
+  return { products, userData };
 };
 
 export default function Index() {
-  const loaderData = useLoaderData() as any;
+  const loaderData = useLoaderData<typeof loader>();
   return (
     <Container>
       <header>
-        <Navbar user={loaderData?.user} />
+        <Navbar user={loaderData.userData} />
       </header>
       <BannerSlider />
       <section className="flex h-fit pt-10">
@@ -54,9 +57,9 @@ export default function Index() {
           <p>¡Grandes ofertas, grandes ahorros, solo para ti!</p>
           <Filter />
           <div className="grid grid-cols-3 gap-10 mt-2">
-            <ProductBox />
-            <ProductBox />
-            <ProductBox />
+            {loaderData.products.map((product) => (
+              <ProductBox key={product.id} />
+            ))}
           </div>
         </div>
       </section>

@@ -12,7 +12,7 @@ type ProductFields = {
   amount: number;
   price: number;
   porcentage: number;
-  sku: string;
+  sku: number;
   categoryId: string;
   subCategoryId: string;
   exclusive: boolean;

@@ -9,9 +9,15 @@ import {
   unstable_createMemoryUploadHandler as createMemoryUploadHandler,
   unstable_parseMultipartFormData as parseMultipartFormData,
 } from "@remix-run/node";
-import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useActionData,
+  useLoaderData,
+  useSubmit,
+} from "@remix-run/react";
 import { useState, useEffect } from "react";
-import { getCategories } from "~/database/hooks/category.server";
+import { getCategories, getCategory } from "~/database/hooks/category.server";
 import ProductFeatures from "~/components/form/product_features";
 import ProductEdit from "~/components/store/product_edit";
 import InputCustom from "~/components/form/input";
@@ -29,13 +35,16 @@ import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { toast } from "sonner";
 import { uploadImage } from "~/services/cloudinary.server";
+import { validateProduct } from "~/services/product.server";
+import { custom } from "zod";
+import { createProduct } from "~/database/hooks/product.server";
 
 type ProductFields = {
   name: string;
   amount: number;
   price: number;
   porcentage: number;
-  sku: string;
+  sku: number;
   categoryId: string;
   subCategoryId: string;
   exclusive: boolean;
@@ -57,7 +66,7 @@ const initialValues = {
   amount: 0,
   price: 0,
   porcentage: 0,
-  sku: "",
+  sku: 0,
   categoryId: "",
   subCategoryId: "",
   exclusive: false,
@@ -73,13 +82,14 @@ export const meta: MetaFunction = () => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
+  let alerts = {};
   const uploadHandler: UploadHandler = composeUploadHandlers(
     async ({ name, data, contentType, filename }) => {
       if (name !== "img") {
         return undefined;
       }
-      // const uploadedImage = await uploadImage(data);
-      // return uploadedImage.secure_url;
+      const uploadedImage = await uploadImage(data);
+      return uploadedImage.secure_url;
       return null;
     },
     createMemoryUploadHandler()
@@ -88,26 +98,67 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const body = await parseMultipartFormData(request, uploadHandler);
   const product = {
     name: body.get("name") as string,
-    sku: body.get("sku") as string,
-    amount: body.get("amount") as string,
-    price: body.get("price") as string,
+    sku: parseInt(body.get("sku") as string),
+    amount: parseInt(body.get("amount") as string),
+    price: parseFloat(body.get("price") as string),
     description: body.get("description") as string,
-    promoId: body.get("promoId") as string,
     categoryId: body.get("categoryId") as string,
     subCategoryId: body.get("subCategoryId") as string,
-    exclusive: body.get("exclusive") as string,
     image: body.get("img") as string,
   };
   const globalFeatures = {
-    custom_features: JSON.parse(body.get("custom_features") as string),
-    featuresByCategory: JSON.parse(body.get("featuresByCategory") as string),
-    finalDate: body.get("finalDate") as string,
+    custom_features: JSON.parse(
+      body.get("custom_features") as string
+    ) as string[],
+    featuresByCategory: JSON.parse(
+      body.get("featuresByCategory") as string
+    ) as Record<string, string>,
   };
   const customPromo = {
     discount: body.get("checkbox_discount") as string,
-    porcentage: body.get("porcentage") as string,
+    porcentage: parseInt(body.get("porcentage") as string),
+    finalDate: body.get("finalDate") as string,
   };
-  return null;
+  const exclusive = body.get("exclusive") as string;
+  const promoId = body.get("promoId") as string;
+  // validations
+  const productAlerts = validateProduct(product);
+  if (productAlerts !== null) {
+    alerts = productAlerts;
+  }
+  const category = await getCategory(product.categoryId);
+  if (customPromo.discount !== null) {
+    if (
+      customPromo.porcentage.toString() === "" ||
+      customPromo.porcentage > 100
+    ) {
+      alerts = { ...alerts, porcentage: "El porcentage no es valido." };
+    }
+    if (customPromo.finalDate === "") {
+      alerts = { ...alerts, finalDate: "La fecha final es requerida." };
+    }
+  }
+  if (
+    Object.keys(globalFeatures.featuresByCategory).length !==
+    category?.features.length
+  ) {
+    alerts = {
+      ...alerts,
+      featuresByCategory: "Faltan características por rellenar.",
+    };
+  }
+  if (Object.values(alerts).length > 0) {
+    return json(alerts, { status: 400, statusText: "Datos incompletos" });
+  }
+  const values = {
+    product,
+    promoId,
+    exclusive,
+    globalFeatures,
+    customPromo,
+  } as any;
+  const new_product = await createProduct(values);
+  return new_product;
 };
 
 export const loader = async () => {
@@ -172,6 +223,7 @@ const AlertInfo = ({
 };
 
 export default function ProductCreate() {
+  const actionData = useActionData<typeof action>();
   const loaderData = useLoaderData<typeof loader>();
   const [product, setProduct] = useState<ProductFields>(initialValues);
   const [categorySelected, setCategorySelected] = useState<Category>({});
@@ -299,19 +351,22 @@ export default function ProductCreate() {
             handleChange={(e) =>
               setProduct({ ...product, name: e.target.value })
             }
+            error={actionData?.name}
             value={product.name}
           />
           <InputCustom
             id="sku"
-            type="text"
+            type="number"
             label="SKU del producto"
             description="Ingresa el identificador del producto"
             name="sku"
             width="w-full"
-            handleChange={(e) =>
-              setProduct({ ...product, sku: e.target.value })
-            }
-            value={product.sku}
+            handleChange={(e: any) => {
+              if (!isNaN(e.target.value) || e.target.value.toString() === "") {
+                setProduct({ ...product, sku: parseInt(e.target.value) });
+              }
+            }}
+            value={product.sku === 0 ? "" : product.sku.toString()}
           />
           <div className="w-full flex justify-between gap-5">
             <InputCustom
@@ -633,6 +688,7 @@ export default function ProductCreate() {
               className="hover:cursor-pointer h-14 pt-4"
               onChange={handleSetImage}
               accept="image/*"
+              size={1000000}
             />
             <div className="flex justify-end">
               <Button
