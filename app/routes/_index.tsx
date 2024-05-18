@@ -1,10 +1,6 @@
-import { LoaderFunctionArgs, MetaFunction, redirect } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaFunction, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { getSession } from "~/services/session.server";
 import { TbTruckDelivery } from "react-icons/tb";
-import jwt from "jsonwebtoken";
-import { Product, User } from "@prisma/client";
-import { getUserByID } from "~/database/hooks/user.server";
 // components
 import Container from "~/components/layouts/container";
 import Navbar from "~/components/layouts/navbar";
@@ -14,6 +10,7 @@ import ProductBox from "~/components/store/product_box";
 import Banner from "~/components/layouts/banner";
 import BannerSlider from "~/components/layouts/banner_slider";
 import { getProducts } from "~/database/hooks/product.server";
+import { getUserBySession } from "~/services/user.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -27,39 +24,30 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  let userData;
-  const session = await getSession(request.headers.get("Cookie"));
-  if (session.data?.token) {
-    const user = jwt.verify(
-      session.data.token as string,
-      process.env.SECRET_KEY as string
-    ) as User;
-    const userFound = await getUserByID(user.id);
-    if (userFound?.role == "ADMIN") return redirect("/panel");
-    userData = user;
-  }
-  const products = (await getProducts()) as Product;
-  return { products, userData };
+  const user = await getUserBySession(request);
+  const products = await getProducts();
+  return json({ user, products }, { status: 200 });
 };
 
 export default function Index() {
-  const loaderData = useLoaderData<typeof loader>();
+  const { user, products } = useLoaderData<typeof loader>();
   return (
     <Container>
       <header>
-        <Navbar user={loaderData.userData} />
+        <Navbar data={user} />
       </header>
       <BannerSlider />
-      <section className="flex h-fit pt-10">
+      <section className="flex items-stretch pt-10">
         <CategoryBox />
-        <div className="px-5 w-full">
+        <div className="px-5">
           <h3 className="font-black text-3xl">OFERTAS</h3>
           <p>¡Grandes ofertas, grandes ahorros, solo para ti!</p>
           <Filter />
           <div className="grid grid-cols-3 gap-10 mt-2">
-            {loaderData.products.map((product) => (
-              <ProductBox key={product.id} />
-            ))}
+            {products !== null &&
+              products.map((product) => (
+                <ProductBox key={product.id} item={product} />
+              ))}
           </div>
         </div>
       </section>

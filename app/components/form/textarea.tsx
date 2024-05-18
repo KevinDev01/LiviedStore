@@ -8,7 +8,7 @@ interface TextAreaFieldsProps {
   error?: React.ReactNode;
   width: string;
   height: string;
-  handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   value?: string;
 }
 
@@ -26,6 +26,8 @@ const TextArea: FC<TextAreaFieldsProps> = ({
   return (
     <div className={`relative ${width} ${height} mx-auto`}>
       <textarea
+        autoCapitalize="sentence"
+        autoComplete="on"
         onChange={handleChange}
         defaultValue={value}
         placeholder=" "
@@ -42,8 +44,13 @@ const TextArea: FC<TextAreaFieldsProps> = ({
         className="absolute top-14 -translate-y-[84px] peer-placeholder-shown:-translate-y-10 peer-focus:-translate-y-[84px] translate-x-2 transition duration-300">
         {label}
       </label>
-      {error}
-      <p className="text-sm ml-2 font-semibold">
+      <p
+        className={`${
+          error ? "py-1 px-2" : null
+        } bg-red-100 text-red-500 font-medium rounded-md block my-2`}>
+        {error}
+      </p>
+      <p className="text-sm ml-2 font-semibold ">
         {description}
         <span className="text-red-400 text-lg font-bold">*</span>
       </p>

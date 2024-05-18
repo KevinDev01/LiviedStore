@@ -1,35 +1,46 @@
+import { Promo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { formatterPrice, getDaysToDB, getPriceWithDiscount } from "~/lib/utils";
 
-const ProductEdit = ({}) => {
+type ProductBoxProps = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  discount: boolean;
+  porcentage: number | null;
+  exclusive: boolean;
+  amount: number;
+  img: string;
+  finalDate: string | null;
+  promo: Promo | null;
+};
+
+const ProductBox = ({ item }: { item: ProductBoxProps }) => {
+  const {
+    id,
+    discount,
+    name,
+    amount,
+    price,
+    porcentage,
+    exclusive,
+    description,
+    img: image,
+    finalDate,
+    promo,
+  } = item;
+
   return (
     <Link
-      to={"#"}
-      className="block group w-80 min-w-80 max-w-80 h-[32rem] p-2 bg-white border rounded-md shadow-md space-y-2 hover:shadow-xl transition ease-in"
-    >
+      to={`/product/${id}`}
+      className="block group w-80 min-w-80 max-w-80 h-[32rem] p-2 bg-white border rounded-md shadow-md space-y-2 hover:shadow-xl transition ease-in">
       <div className="overflow-hidden p-1 rounded-md h-60">
-        {image ? (
-          <img
-            src={image}
-            className="h-60 scale-110 w-full group-hover:scale-125 transition ease-in"
-            loading="lazy"
-          />
-        ) : (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1}
-            stroke="currentColor"
-            className="w-full h-full text-neutral-300 p-2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-            />
-          </svg>
-        )}
+        <img
+          src={image}
+          className="h-60 scale-110 w-full group-hover:scale-125 transition ease-in"
+          loading="lazy"
+        />
       </div>
       <hr />
       <h3 className="font-medium group-hover:text-blue-600 text-lg truncate">
@@ -43,8 +54,7 @@ const ProductEdit = ({}) => {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4"
-          >
+            className="w-4 h-4">
             <path
               fillRule="evenodd"
               d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
@@ -55,8 +65,7 @@ const ProductEdit = ({}) => {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4"
-          >
+            className="w-4 h-4">
             <path
               fillRule="evenodd"
               d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
@@ -67,8 +76,7 @@ const ProductEdit = ({}) => {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4"
-          >
+            className="w-4 h-4">
             <path
               fillRule="evenodd"
               d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
@@ -79,8 +87,7 @@ const ProductEdit = ({}) => {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4"
-          >
+            className="w-4 h-4">
             <path
               fillRule="evenodd"
               d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
@@ -91,8 +98,7 @@ const ProductEdit = ({}) => {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4"
-          >
+            className="w-4 h-4">
             <path
               fillRule="evenodd"
               d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
@@ -109,7 +115,7 @@ const ProductEdit = ({}) => {
             Nuevo Item
           </p>
         </div>
-        {discount || promoId ? (
+        {discount === true || promo?.id ? (
           <div className="w-fit bg-red-500 text-white px-3 py-1 rounded-md shadow-md">
             <p className="font-medium text-xs uppercase">Oferta</p>
           </div>
@@ -123,40 +129,36 @@ const ProductEdit = ({}) => {
       <div>
         <div className="flex items-center gap-2">
           <p className="block text-2xl font-medium">
-            {discount && price !== 0 && porcentage !== 0
+            {discount && price !== 0 && porcentage !== 0 && porcentage !== null
               ? getPriceWithDiscount(price, porcentage)
-              : promoId &&
-                typeof promo.value === "number" &&
+              : promo?.value &&
                 promo.value > 0 &&
-                price !== 0
-              ? getPriceWithDiscount(price, promo.value)
-              : price
-              ? formatterPrice(price)
-              : formatterPrice(0)}
+                price !== 0 &&
+                discount === false
+              ? getPriceWithDiscount(price, promo?.value)
+              : formatterPrice(price)}
           </p>
-          {(discount || promoId) && (
+          {(discount || promo?.id) && (
             <p className="ml-1 text-sm text-green-600 font-medium">
               {porcentage
                 ? porcentage
-                : promo.value
-                ? promo.value.toString()
+                : promo?.value
+                ? promo?.value.toString()
                 : "0"}
               % OFF
             </p>
           )}
-          {discount && date ? (
+          {discount && finalDate ? (
             <p className="ml-1 text-green-600 font-medium text-sm uppercase text-center">
-              Quedan {getDays(date)} dias
+              Quedan {getDaysToDB(finalDate.toString())} dias
             </p>
-          ) : promoId &&
-            promo.finalDate &&
-            typeof promo.finalDate === "string" ? (
+          ) : promo?.id && promo?.finalDate ? (
             <p className="ml-1 text-green-600 font-medium text-sm uppercase text-center">
-              Quedan {getDaysToDB(promo.finalDate)} dias
+              Quedan {getDaysToDB(promo?.finalDate.toString())} dias
             </p>
           ) : null}
         </div>
-        {discount && (
+        {(discount || promo?.id) && (
           <p className="line-through text-sm text-neutral-500">
             {formatterPrice(price)}
           </p>
@@ -170,4 +172,4 @@ const ProductEdit = ({}) => {
   );
 };
 
-export default ProductEdit;
+export default ProductBox;

@@ -2,14 +2,17 @@ import Input from "./input";
 
 const ProductFeatures = ({
   features,
-  handleChangeFeatureInput,
+  onChange,
+  errors,
 }: {
-  features: any;
-  handleChangeFeatureInput: any;
+  features: string[] | undefined;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>, name: string) => void;
+  errors: string | undefined;
 }) => {
+  if (!features) return null;
   return (
     <>
-      {features.length > 0 && <p>Características del producto</p>}
+      <p>Características del producto</p>
       <div className="grid grid-cols-2 items-center gap-x-3 gap-y-8">
         {features.length > 0 ? (
           features.map((feature: any) => (
@@ -21,7 +24,8 @@ const ProductFeatures = ({
               description={`Ingresa el valor del apartado ${feature}`}
               type="text"
               width="1/2"
-              handleChange={(e) => handleChangeFeatureInput(e, feature)}
+              handleChange={(e) => onChange(e, feature)}
+              error={errors && `El campo ${feature} es requerido`}
             />
           ))
         ) : (

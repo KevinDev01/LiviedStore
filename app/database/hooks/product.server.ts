@@ -21,27 +21,34 @@ export async function createProduct({
   globalFeatures,
   customPromo,
 }: Values) {
-  const {
-    name,
-    sku,
-    amount,
-    price,
-    description,
-    categoryId,
-    subCategoryId,
-    image,
-  } = product;
-  const { discount, porcentage, finalDate } = customPromo;
-  const { custom_features, featuresByCategory } = globalFeatures;
   try {
-    const product = await db.product.create({
+    const {
+      name,
+      sku,
+      amount,
+      price,
+      description,
+      categoryId,
+      subCategoryId,
+      image,
+      image2,
+      image3,
+      image4,
+    } = product;
+    const { discount, porcentage, finalDate } = customPromo;
+    const { custom_features, featuresByCategory } = globalFeatures;
+    const newProduct = await db.product.create({
       data: {
+        promoId,
         name,
         sku: parseInt(sku),
         price: parseFloat(price),
         amount: parseInt(amount),
         description,
-        img: image,
+        image,
+        image2,
+        image3,
+        image4,
         categoryId,
         subCategoryId,
         discount: discount === null ? false : true,
@@ -54,19 +61,18 @@ export async function createProduct({
         })),
       },
     });
-    return product;
+    return newProduct;
   } catch (error) {
-    console.log(error);
     return error;
   }
 }
 
 export async function getProducts() {
-  try {
-    const products = await db.product.findMany();
-    return products;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
+  const products = await db.product.findMany({
+    include: {
+      promo: true,
+    },
+  });
+  if (products.length <= 0) return null;
+  return products;
 }

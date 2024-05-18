@@ -1,47 +1,19 @@
-import { FC } from "react";
-import { Link } from "@remix-run/react";
 import {
   formatterPrice,
   getDays,
   getDaysToDB,
   getPriceWithDiscount,
 } from "~/lib/utils";
-
-type ProductFields = {
-  name: string;
-  amount: number;
-  price: number;
-  porcentage: number;
-  sku: number;
-  categoryId: string;
-  subCategoryId: string;
-  exclusive: boolean;
-  description: string;
-  promoId: string;
-  features: Array<Record<string, string>>;
-  featuresByCategory: Record<string, string | number>;
-  image: string;
-};
-
-type Promo = {
-  cupon: string;
-  finalDate: string;
-  id: string;
-  name: string;
-  subCategoryId: string;
-  value: number;
-};
+import { PromoCustomProduct, ProductFields } from "~/lib/types";
 
 const ProductEdit = ({
   product,
-  date,
   discount,
   promo,
 }: {
   product: ProductFields;
-  date: Date | undefined;
   discount: boolean;
-  promo: Promo | Record<string, string | null | Date | number>;
+  promo: PromoCustomProduct | undefined;
 }) => {
   const {
     name,
@@ -55,9 +27,7 @@ const ProductEdit = ({
   } = product;
 
   return (
-    <Link
-      to={"#"}
-      className="block group w-80 min-w-80 max-w-80 h-[32rem] p-2 bg-white border rounded-md shadow-md space-y-2 hover:shadow-xl transition ease-in">
+    <div className="block group w-80 min-w-80 max-w-80 h-[32rem] p-2 bg-white border rounded-md shadow-md space-y-2 hover:shadow-xl transition ease-in">
       <div className="overflow-hidden p-1 rounded-md h-60">
         {image ? (
           <img
@@ -72,7 +42,8 @@ const ProductEdit = ({
             viewBox="0 0 24 24"
             strokeWidth={1}
             stroke="currentColor"
-            className="w-full h-full text-neutral-300 p-2">
+            className="w-full h-full text-neutral-300 p-2"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -93,7 +64,8 @@ const ProductEdit = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4">
+            className="w-4 h-4"
+          >
             <path
               fillRule="evenodd"
               d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
@@ -104,7 +76,8 @@ const ProductEdit = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4">
+            className="w-4 h-4"
+          >
             <path
               fillRule="evenodd"
               d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
@@ -115,7 +88,8 @@ const ProductEdit = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4">
+            className="w-4 h-4"
+          >
             <path
               fillRule="evenodd"
               d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
@@ -126,7 +100,8 @@ const ProductEdit = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4">
+            className="w-4 h-4"
+          >
             <path
               fillRule="evenodd"
               d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
@@ -137,7 +112,8 @@ const ProductEdit = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4">
+            className="w-4 h-4"
+          >
             <path
               fillRule="evenodd"
               d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
@@ -170,10 +146,7 @@ const ProductEdit = ({
           <p className="block text-2xl font-medium">
             {discount && price !== 0 && porcentage !== 0
               ? getPriceWithDiscount(price, porcentage)
-              : promoId &&
-                typeof promo.value === "number" &&
-                promo.value > 0 &&
-                price !== 0
+              : promo && promo.value > 0 && price !== 0
               ? getPriceWithDiscount(price, promo.value)
               : price
               ? formatterPrice(price)
@@ -183,25 +156,23 @@ const ProductEdit = ({
             <p className="ml-1 text-sm text-green-600 font-medium">
               {porcentage
                 ? porcentage
-                : promo.value
+                : promo && promo.value
                 ? promo.value.toString()
                 : "0"}
               % OFF
             </p>
           )}
-          {discount && date ? (
+          {discount && product.finalDate ? (
             <p className="ml-1 text-green-600 font-medium text-sm uppercase text-center">
-              Quedan {getDays(date)} dias
+              Quedan {getDays(product.finalDate)} dias
             </p>
-          ) : promoId &&
-            promo.finalDate &&
-            typeof promo.finalDate === "string" ? (
+          ) : promo && promo.finalDate ? (
             <p className="ml-1 text-green-600 font-medium text-sm uppercase text-center">
               Quedan {getDaysToDB(promo.finalDate)} dias
             </p>
           ) : null}
         </div>
-        {discount && (
+        {(discount || promoId) && (
           <p className="line-through text-sm text-neutral-500">
             {formatterPrice(price)}
           </p>
@@ -211,7 +182,7 @@ const ProductEdit = ({
       <p className="line-clamp-2">
         {description ? description : "Descripción del producto"}
       </p>
-    </Link>
+    </div>
   );
 };
 

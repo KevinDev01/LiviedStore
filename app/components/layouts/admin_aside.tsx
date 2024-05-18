@@ -46,7 +46,7 @@ const AdminAside = () => {
           <p className="font-medium text-sm pl-5 mt-2 text-sky-800">Cuenta</p>
           <nav className="w-full space-y-2 p-1">
             <Form action="/logout" method="POST">
-              <button className="flex items-center h-10 pl-4 text-md text-white bg-red-600 hover:bg-red-500 transition ease-in rounded-md">
+              <button className="flex items-center h-10 pl-3 text-md text-white bg-red-600 hover:bg-red-500 transition ease-in rounded-md">
                 Cerrar session
               </button>
             </Form>
