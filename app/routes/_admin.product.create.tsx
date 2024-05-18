@@ -5,6 +5,7 @@ import type {
 } from "@remix-run/node";
 import {
   json,
+  redirect,
   unstable_composeUploadHandlers,
   unstable_createMemoryUploadHandler,
   unstable_parseMultipartFormData,
@@ -62,9 +63,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   try {
     let alerts = {};
     const uploadHandler: UploadHandler = unstable_composeUploadHandlers(
-      async ({ filename, data }) => {
-        // console.log(data);
+      async ({ filename, data, contentType }) => {
         if (filename === undefined) return;
+        if (contentType?.includes("image") === false) return "";
         const uploadedImage = await uploadImage(data);
         return uploadedImage.secure_url;
       },
@@ -85,7 +86,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       image3: body.get("image3") as string,
       image4: body.get("image4") as string,
     };
-    console.log(product);
     const globalFeatures = {
       custom_features: JSON.parse(
         body.get("custom_features") as string
@@ -101,47 +101,47 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     };
     const exclusive = body.get("exclusive") as string;
     const promoId = body.get("promoId") as string;
-    //### validations ###
-    // const productAlerts = validateProduct(product);
-    // if (productAlerts !== null) {
-    //   alerts = productAlerts;
-    // }
-    // if (!product.image) {
-    //   alerts = { ...alerts, image: "La imagen es requerida." };
-    // }
-    // const category = await getCategory(product.categoryId);
-    // if (customPromo.discount !== null) {
-    //   if (
-    //     customPromo.porcentage.toString() === "" ||
-    //     customPromo.porcentage > 100
-    //   ) {
-    //     alerts = { ...alerts, porcentage: "El porcentage no es valido." };
-    //   }
-    //   if (customPromo.finalDate === "") {
-    //     alerts = { ...alerts, finalDate: "La fecha final es requerida." };
-    //   }
-    // }
-    // if (
-    //   Object.keys(globalFeatures.featuresByCategory).length !==
-    //   category?.features.length
-    // ) {
-    //   alerts = {
-    //     ...alerts,
-    //     featuresByCategory: "Faltan características por rellenar.",
-    //   };
-    // }
-    // if (Object.values(alerts).length > 0) {
-    //   return json(alerts, { status: 400, statusText: "Datos incompletos." });
-    // }
-    // const values = {
-    //   product,
-    //   promoId,
-    //   exclusive,
-    //   globalFeatures,
-    //   customPromo,
-    // } as any;
-    // const new_product = await createProduct(values);
-    return null;
+    // validations
+    const productAlerts = validateProduct(product);
+    if (productAlerts !== null) {
+      alerts = productAlerts;
+    }
+    if (!product.image) {
+      alerts = { ...alerts, image: "La imagen es requerida." };
+    }
+    const category = await getCategory(product.categoryId);
+    if (customPromo.discount !== null) {
+      if (
+        customPromo.porcentage.toString() === "" ||
+        customPromo.porcentage > 100
+      ) {
+        alerts = { ...alerts, porcentage: "El porcentage no es valido." };
+      }
+      if (customPromo.finalDate === "") {
+        alerts = { ...alerts, finalDate: "La fecha final es requerida." };
+      }
+    }
+    if (
+      Object.keys(globalFeatures.featuresByCategory).length !==
+      category?.features.length
+    ) {
+      alerts = {
+        ...alerts,
+        featuresByCategory: "Faltan características por rellenar.",
+      };
+    }
+    if (Object.values(alerts).length > 0) {
+      return json(alerts, { status: 400, statusText: "Datos incompletos." });
+    }
+    const values = {
+      product,
+      promoId,
+      exclusive,
+      globalFeatures,
+      customPromo,
+    } as any;
+    const new_product = await createProduct(values);
+    return redirect("/panel");
   } catch (error) {
     console.log(error);
     return { error: "Error al crear el producto, la imagen es requerida." };
@@ -260,8 +260,6 @@ export default function ProductCreate() {
     setProduct({ ...product, customFeatures: newCustomFeatures });
     toast.success("La característica personalizada ha sido eliminada.");
   };
-
-  console.log(product);
 
   return (
     <>
@@ -733,6 +731,11 @@ export default function ProductCreate() {
             type="hidden"
             defaultValue={JSON.stringify(product.customFeatures)}
             name="custom_features"
+          />
+          <input
+            type="hidden"
+            defaultValue={product.finalDate?.toString()}
+            name="finalDate"
           />
         </Form>
       </div>
