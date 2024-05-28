@@ -44,6 +44,7 @@ export const meta: MetaFunction = () => {
 
 export const loader = async () => {
   const data = await getCategories();
+  if (!data) throw new Error("No se encontraron categorías");
   const categories = data.map((category) => ({
     value: category.id,
     name: category.name,
@@ -142,7 +143,8 @@ export default function promo_create() {
           formData.append("subCategoryId", promo.subCategoryId);
           formData.append("date", date.toDateString());
           submit(formData, { method: "POST" });
-        }}>
+        }}
+      >
         <Input
           type="text"
           name="name"
@@ -204,7 +206,8 @@ export default function promo_create() {
           </p>
           <Select
             disabled={typePromo === "subcategory" ? false : true}
-            onValueChange={(id) => handleCategory(id)}>
+            onValueChange={(id) => handleCategory(id)}
+          >
             <SelectTrigger className="flex-1 h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-200">
               <SelectValue placeholder="Selecciona la categoria" />
             </SelectTrigger>
@@ -227,7 +230,8 @@ export default function promo_create() {
                 ? false
                 : true
             }
-            onValueChange={(id) => setPromo({ ...promo, subCategoryId: id })}>
+            onValueChange={(id) => setPromo({ ...promo, subCategoryId: id })}
+          >
             <SelectTrigger className="flex-1 h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-200">
               <SelectValue placeholder="Selecciona la subcategoria correspondiente" />
             </SelectTrigger>
@@ -247,7 +251,8 @@ export default function promo_create() {
               className={cn(
                 "h-14 justify-start text-left font-normal",
                 !date && "text-muted-foreground"
-              )}>
+              )}
+            >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {date ? format(date, "PPP") : <span>Fin de la promocion</span>}
             </Button>

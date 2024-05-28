@@ -44,8 +44,7 @@ export function formatterDateFromString(date: string) {
 }
 
 export function getPriceWithDiscount(price: number, porcentage: number) {
-  const withDiscount = price - (porcentage / 100) * price;
-  return formatterPrice(withDiscount);
+  return price - (porcentage / 100) * price;
 }
 
 export function getDays(dateObjetive: Date) {

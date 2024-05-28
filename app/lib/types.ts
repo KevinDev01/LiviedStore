@@ -45,7 +45,7 @@ export type ProductFields = {
   exclusive: boolean;
   discount: boolean;
   description: string;
-  customFeatures: Array<{ id: number; name: string }>;
+  customFeatures: Array<Record<string, string | number>>;
   featuresByCategory: Record<string, string>;
   promoId: string;
   finalDate: Date | undefined;

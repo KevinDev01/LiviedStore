@@ -23,7 +23,7 @@ const BannerSlider = () => {
         // navigation={true}
         modules={[Autoplay, Pagination, Navigation]}
         className="mySwiper h-96">
-        <SwiperSlide className="bg-sky-400 rounded-3xl">
+        <SwiperSlide className="bg-sky-400 rounded-md">
           <div className="h-full flex flex-col justify-center items-center gap-1">
             <h1 className="text-5xl font-black">
               <span className="text-red-600">%30</span> de descuento
@@ -39,7 +39,7 @@ const BannerSlider = () => {
             </Link>
           </div>
         </SwiperSlide>
-        <SwiperSlide className="bg-amber-400 rounded-3xl">vapes</SwiperSlide>
+        <SwiperSlide className="bg-amber-400 rounded-md">vapes</SwiperSlide>
       </Swiper>
     </>
   );

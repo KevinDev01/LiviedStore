@@ -1,6 +1,13 @@
-import { Promo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { formatterPrice, getDaysToDB, getPriceWithDiscount } from "~/lib/utils";
+
+type Promo = {
+  id: string;
+  name: string;
+  finalDate: Date;
+  value: number;
+  cupon: string | null;
+};
 
 type ProductBoxProps = {
   id: string;
@@ -13,10 +20,10 @@ type ProductBoxProps = {
   amount: number;
   image: string;
   finalDate: string | null;
-  promo: Promo | null;
+  promo?: Promo | any;
 };
 
-const ProductBox = ({ item }: { item: ProductBoxProps }) => {
+const ProductBox = ({ product }: { product: ProductBoxProps }) => {
   const {
     id,
     discount,
@@ -29,11 +36,11 @@ const ProductBox = ({ item }: { item: ProductBoxProps }) => {
     image,
     finalDate,
     promo,
-  } = item;
+  } = product;
 
   return (
     <Link
-      to={`/product/${id}`}
+      to={`/item/${id}`}
       className="block group w-80 min-w-80 max-w-80 h-[32rem] p-2 bg-white border rounded-md shadow-md space-y-2 hover:shadow-xl transition ease-in"
     >
       <div className="overflow-hidden p-1 rounded-md h-60">
@@ -136,12 +143,12 @@ const ProductBox = ({ item }: { item: ProductBoxProps }) => {
         <div className="flex items-center gap-2">
           <p className="block text-2xl font-medium">
             {discount && price !== 0 && porcentage !== 0 && porcentage !== null
-              ? getPriceWithDiscount(price, porcentage)
+              ? formatterPrice(getPriceWithDiscount(price, porcentage))
               : promo?.value &&
                 promo.value > 0 &&
                 price !== 0 &&
                 discount === false
-              ? getPriceWithDiscount(price, promo?.value)
+              ? formatterPrice(getPriceWithDiscount(price, promo?.value))
               : formatterPrice(price)}
           </p>
           {(discount || promo?.id) && (

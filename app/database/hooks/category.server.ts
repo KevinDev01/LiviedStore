@@ -46,8 +46,8 @@ export async function updateCategory(
 }
 
 export async function getCategories() {
-  try {
-    const allCategories = await db.category.findMany({
+  return await db.category
+    .findMany({
       include: {
         subCategories: {
           include: {
@@ -55,14 +55,13 @@ export async function getCategories() {
           },
         },
       },
+    })
+    .then((categories) => categories)
+    .catch((error) => {
+      console.log(error);
+      return null;
     });
-    return allCategories;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
 }
-
 export async function getCategory(id: string) {
   try {
     const category = await db.category.findUnique({

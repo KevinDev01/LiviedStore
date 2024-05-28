@@ -22,6 +22,7 @@ model User {
   password String
   verified Boolean @default(false)
   orders Orders[]
+  questions Question[]
   address Address?
   role Role @default(USER)
 }
@@ -43,6 +44,7 @@ model Product {
   description String
   amount Int
   comments Comment[]
+  questions Question[]
   image String
   image2 String?
   image3 String?
@@ -99,6 +101,16 @@ model Promo {
 model Comment {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   comment String
+  product Product @relation(fields: [productId], references: [id])
+  productId  String @db.ObjectId
+}
+
+model Question {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  question String
+  answer String?
+  user User @relation(fields: [userId], references: [id])
+  userId String @db.ObjectId
   product Product @relation(fields: [productId], references: [id])
   productId  String @db.ObjectId
 }

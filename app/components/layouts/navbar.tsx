@@ -20,15 +20,17 @@ import {
 const Navbar = ({ data }: { data: User | null }) => {
   return (
     <nav className="py-5 flex items-center">
-      <div className="w-48 h-16 overflow-hidden flex justify-center items-center">
+      <Link
+        to={"/"}
+        className="w-48 h-16 overflow-hidden flex justify-center items-center">
         <img className="" src="/resources/LIV.svg" alt="Livied" />
-      </div>
+      </Link>
       <ul className="w-full flex justify-between">
         <li className="flex-1 mx-20">
           <Form className="relative">
             <input
               placeholder="¿Qué estás buscando hoy?"
-              className="w-full h-12 bg-neutral-50 text-xl pl-1 pr-10 rounded-md border border-neutral-600 md:focus:border-blue-400 md:focus:outline-none md:focus:ring-2 md:focus:ring-sky-200 transition ease-out"
+              className="w-full h-12 bg-neutral-50 placeholder:font-light text-xl pl-1 pr-10 rounded-md border border-neutral-300 md:focus:border-blue-400 md:focus:outline-none md:focus:ring-2 md:focus:ring-sky-200 transition ease-out"
             />
             <button className="absolute top-3 right-3">
               <svg
@@ -37,7 +39,7 @@ const Navbar = ({ data }: { data: User | null }) => {
                 viewBox="0 0 24 24"
                 strokeWidth={1}
                 stroke="currentColor"
-                className="w-6 h-6 hover:scale-110 transition ease-out">
+                className="w-6 h-6 hover:scale-110 transition ease-out text-neutral-500 hover:text-neutral-600">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

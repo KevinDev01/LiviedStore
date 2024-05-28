@@ -46,7 +46,7 @@ export default function Index() {
           <div className="grid grid-cols-3 gap-10 mt-2">
             {products !== null &&
               products.map((product) => (
-                <ProductBox key={product.id} item={product} />
+                <ProductBox key={product.id} product={product} />
               ))}
           </div>
         </div>

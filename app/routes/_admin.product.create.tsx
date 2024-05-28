@@ -68,6 +68,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         if (contentType?.includes("image") === false) return "";
         const uploadedImage = await uploadImage(data);
         return uploadedImage.secure_url;
+        return null;
       },
       unstable_createMemoryUploadHandler()
     );
@@ -140,8 +141,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       globalFeatures,
       customPromo,
     } as any;
+    console.log(globalFeatures.custom_features);
     const new_product = await createProduct(values);
-    return redirect("/panel");
+    return new_product;
   } catch (error) {
     console.log(error);
     return { error: "Error al crear el producto, la imagen es requerida." };
@@ -227,14 +229,17 @@ export default function ProductCreate() {
   const addCustomFeature = () => {
     const input = document.querySelector("#customFeature") as HTMLInputElement;
     if (!input) return;
-    const name = input.value;
-    if (name === "") {
+    const value = input.value;
+    if (value === "") {
       toast.error(
         "El campo de caracteristicas customizadas no puede estar vacío."
       );
       return;
     }
-    const newFeature = { id: Date.now(), name };
+    const newFeature: Record<string, number | string> = {
+      id: Date.now(),
+      name: value,
+    };
     setProduct({
       ...product,
       customFeatures: [...product.customFeatures, newFeature],
@@ -277,8 +282,7 @@ export default function ProductCreate() {
           <h2 className="text-2xl text-center font-medium">Nuevo producto</h2>
           <Link
             to={"/panel"}
-            className="hover:underline hover:text-red-600 transition ease-in"
-          >
+            className="hover:underline hover:text-red-600 transition ease-in">
             Volver
           </Link>
         </div>
@@ -287,8 +291,7 @@ export default function ProductCreate() {
         <Form
           method="post"
           className="pt-5 space-y-7"
-          encType="multipart/form-data"
-        >
+          encType="multipart/form-data">
           <InputCustom
             id="name"
             type="text"
@@ -343,8 +346,7 @@ export default function ProductCreate() {
                 name="categoryId"
                 onValueChange={(categoryId) =>
                   setProduct({ ...product, categoryId })
-                }
-              >
+                }>
                 <SelectTrigger className="w-full h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-200">
                   <SelectValue placeholder="Selecciona una categoría" />
                 </SelectTrigger>
@@ -372,8 +374,7 @@ export default function ProductCreate() {
                 onValueChange={(subCategoryId) =>
                   setProduct({ ...product, subCategoryId })
                 }
-                name="subCategoryId"
-              >
+                name="subCategoryId">
                 <SelectTrigger className="w-full h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-200">
                   <SelectValue placeholder="Selecciona la sub categoria" />
                 </SelectTrigger>
@@ -383,8 +384,7 @@ export default function ProductCreate() {
                     ?.subcategories.map((subcategory) => (
                       <SelectItem
                         key={subcategory.value}
-                        value={subcategory.value}
-                      >
+                        value={subcategory.value}>
                         {subcategory.name}
                       </SelectItem>
                     ))}
@@ -416,8 +416,7 @@ export default function ProductCreate() {
                   name="promoId"
                   onValueChange={(promoId) =>
                     setProduct({ ...product, promoId })
-                  }
-                >
+                  }>
                   <SelectTrigger className="w-full h-14 text-start text-md focus:ring-sky-200 focus:border-sky-400 border-neutral-200 transition ease-in">
                     <SelectValue placeholder="Selecciona una promoción - (opcional)" />
                   </SelectTrigger>
@@ -453,8 +452,7 @@ export default function ProductCreate() {
               />
               <label
                 htmlFor="checkbox_discount"
-                className="text-md font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
+                className="text-md font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Definir promoción al producto
               </label>
             </div>
@@ -484,8 +482,7 @@ export default function ProductCreate() {
                   className={cn(
                     "w-1/2 h-14 justify-start text-left font-normal",
                     !product.finalDate && "text-muted-foreground"
-                  )}
-                >
+                  )}>
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {product.finalDate ? (
                     format(product.finalDate, "PPP")
@@ -501,8 +498,7 @@ export default function ProductCreate() {
                       ...product,
                       finalDate: addDays(new Date(), parseInt(value)),
                     })
-                  }
-                >
+                  }>
                   <SelectTrigger>
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
@@ -527,8 +523,7 @@ export default function ProductCreate() {
             <p
               className={`text-sm font-semibold ml-3 text-zinc-800 ${
                 product.discount ? "" : "opacity-50"
-              }`}
-            >
+              }`}>
               Cuando termina la promoción?
               <span className="text-red-500 text-lg">*</span>
             </p>
@@ -550,8 +545,7 @@ export default function ProductCreate() {
               />
               <label
                 htmlFor="exclusive"
-                className="text-md font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
+                className="text-md font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Producto exclusivo online?
               </label>
             </div>
@@ -590,35 +584,36 @@ export default function ProductCreate() {
               <Button
                 onClick={() => addCustomFeature()}
                 type="button"
-                className="h-12 w-28 active:bg-zinc-700 active:ring-2 active:ring-zinc-600"
-              >
+                className="h-12 w-28 active:bg-zinc-700 active:ring-2 active:ring-zinc-600">
                 Agregar
               </Button>
               <nav className="py-2 space-y-3">
                 {product.customFeatures.length > 0 ? (
-                  product.customFeatures.map((featureItem) => (
-                    <li
-                      key={featureItem.id}
-                      className="flex gap-2 items-center justify-between px-2 py-1 rounded-md border-b"
-                    >
-                      {featureItem.name}
-                      <svg
-                        onClick={() => deleteFeature(featureItem.id)}
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6 text-red-500 cursor-pointer"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18 18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </li>
-                  ))
+                  product.customFeatures.map((featureItem) => {
+                    return (
+                      <li
+                        key={featureItem.id}
+                        className="flex gap-2 items-center justify-between px-2 py-1 rounded-md border-b">
+                        {featureItem.name}
+                        <svg
+                          onClick={() =>
+                            deleteFeature(featureItem.id as number)
+                          }
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6 text-red-500 cursor-pointer">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6 18 18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </li>
+                    );
+                  })
                 ) : (
                   <Alert
                     message1="!Tu producto no cuenta con datos para el consumidor, agrega
@@ -715,8 +710,7 @@ export default function ProductCreate() {
               ) : (
                 <Button
                   type="submit"
-                  className="h-12 bg-blue-600 hover:bg-blue-500"
-                >
+                  className="h-12 bg-blue-600 hover:bg-blue-500">
                   Crear producto
                 </Button>
               )}
