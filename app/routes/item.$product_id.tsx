@@ -469,16 +469,20 @@ export default function Item() {
             Ultimas realizadas
           </p>
           <div className="pl-4">
-            {questions && questions.length > 0
-              ? questions.map(({ answer, question, id }) => (
-                  <div key={id} className="space-y-1">
-                    <p className="text-lg text-neutral-800">{question}</p>
-                    <p className="before:content-[' '] before:w-[14px] before:h-[14px] before:absolute before:-left-7 before:block before:ml-2 before:border-l before:border-b font-light text-md text-neutral-700 ml-6 relative">
-                      {answer ? answer : "Aun no hay respuesta"}
-                    </p>
-                  </div>
-                ))
-              : null}
+            {questions && questions.length > 0 ? (
+              questions.map(({ answer, question, id }) => (
+                <div key={id} className="space-y-1">
+                  <p className="text-lg text-neutral-800">{question}</p>
+                  <p className="before:content-[' '] before:w-[14px] before:h-[14px] before:absolute before:-left-7 before:block before:ml-2 before:border-l before:border-b font-light text-md text-neutral-700 ml-6 relative">
+                    {answer ? answer : "Aun no hay respuesta"}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-md text-neutral-500">
+                Aun no existen preguntas realiza una si tienes dudas.
+              </p>
+            )}
           </div>
         </div>
         {/* product checkout */}
