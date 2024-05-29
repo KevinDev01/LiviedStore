@@ -468,7 +468,7 @@ export default function Item() {
           <p className="text-lg font-medium text-neutral-800 ml-2">
             Ultimas realizadas
           </p>
-          <div className="pl-4">
+          <div className="pl-4 space-y-3">
             {questions && questions.length > 0 ? (
               questions.map(({ answer, question, id }) => (
                 <div key={id} className="space-y-1">
