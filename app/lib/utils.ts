@@ -28,7 +28,7 @@ export function formatterPrice(precio: number) {
 
 export function formatterDate(date: string) {
   const newDate = new Date(date);
-  return newDate.toLocaleString("es-MX");
+  return newDate.toLocaleDateString("es-MX");
 }
 
 export function formatterDateFromString(date: string) {

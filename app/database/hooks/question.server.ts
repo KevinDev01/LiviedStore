@@ -22,3 +22,33 @@ export async function create_question(
       return null;
     });
 }
+
+export async function get_questions() {
+  return await db.question
+    .findMany({
+      select: {
+        answer: true,
+        question: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            lastname: true,
+          },
+        },
+        product: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        createdAt: true,
+      },
+    })
+    .then((res) => res)
+    .catch((err) => {
+      console.log(err);
+      return null;
+    });
+}
