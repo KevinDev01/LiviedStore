@@ -23,10 +23,11 @@ export async function create_question(
     });
 }
 
-export async function get_questions() {
-  return await db.question
-    .findMany({
+export async function get_questions_and_product() {
+  const [questions, categories] = await db.$transaction([
+    db.question.findMany({
       select: {
+        id: true,
         answer: true,
         question: true,
         user: {
@@ -45,10 +46,60 @@ export async function get_questions() {
         },
         createdAt: true,
       },
+    }),
+    db.category.findMany({
+      select: {
+        id: true,
+        name: true,
+        subCategories: {
+          select: {
+            id: true,
+            name: true,
+            product: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    }),
+  ]);
+  return { questions, categories };
+}
+
+export async function update_question(id: string, answer: string) {
+  return await db.question
+    .update({
+      where: {
+        id,
+      },
+      data: {
+        answer,
+      },
     })
-    .then((res) => res)
+    .then(() => {
+      return { message: "Pregunta actualizada con éxito", type: "success" };
+    })
     .catch((err) => {
       console.log(err);
-      return null;
+      return { message: "La respuesta no fue enviada", type: "error" };
+    });
+}
+
+export async function delete_question(id: string) {
+  return await db.question
+    .delete({
+      where: {
+        id,
+      },
+    })
+    .then(() => {
+      return { message: "Pregunta eliminada correctamente", type: "success" };
+    })
+    .catch((err) => {
+      console.log(err);
+      return { message: "La pregunta no pudo eliminarse", type: "error" };
     });
 }
